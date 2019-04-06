@@ -51,12 +51,13 @@ export class MessageHandler {
 
     public async handle(psid: Psid, message: EventMessage): Promise<void> {
         const client = this.clientManager.get(psid);
+        const text = message.text.toLowerCase();
 
-        if (message.text === "elo") {
+        if (text === "elo") {
             return this.sendMessage(client, { text: "No siemka ziomek" });
         }
 
-        if (message.text === "cancel") {
+        if (text === "cancel") {
             await this.api.sendMessage(client.psid, { text: "Let's start from the beginning..." });
             return this.displayPossibleActions(client);
         }
@@ -192,7 +193,7 @@ export class MessageHandler {
 
         const seconds = Math.min(parseInt(message.text), 1000);
 
-        if (isNaN(seconds)) {
+        if (isNaN(seconds) || seconds < 1) {
             return this.unknownSituation(client);
         }
 
