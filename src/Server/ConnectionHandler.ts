@@ -31,15 +31,15 @@ export class ConnectionHandler {
         this.socket = socket;
 
         this.socket
-            // @ts-ignore
-            .on("data", data => splitData(data, message => this.onMessage(JSON.parse(message))))
+        // @ts-ignore
+            .on("data", data => splitData(data, this.handleMessage))
             .on("close", this.close)
             .on("error", error => {
                 console.error(error);
                 this.close();
             });
 
-        this.send({ type: MessageType.Handshake });
+        this.send({type: MessageType.Handshake});
 
         if (this.onStart) {
             this.onStart();
@@ -57,8 +57,14 @@ export class ConnectionHandler {
         this.socket.write(prependLength(JSON.stringify(message)));
     }
 
-    private onMessage(message: TcpMessage) {
-        console.log("Received message " + message);
+    @boundMethod
+    private handleMessage(message: string): void {
+        try {
+            const data = JSON.parse(message);
+            console.info("Received data", {data});
+        } catch (e) {
+            console.warn(`Invalid message [${message}]`);
+        }
     }
 
     @boundMethod
