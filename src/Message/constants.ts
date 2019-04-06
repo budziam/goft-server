@@ -2,7 +2,6 @@ export enum ActionPayload {
     BetGameDuration = "bet-game-duration",
     BulletColor = "bullet-color",
     SwitchLightsOff = "switch-lights-off",
-    CheckCredits = "check-credits",
     SendMessage = "send-message",
 }
 

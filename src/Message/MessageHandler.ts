@@ -103,10 +103,6 @@ export class MessageHandler {
             return this.onSwitchLightsOffChosen(client);
         }
 
-        if (message.quick_reply.payload === ActionPayload.CheckCredits) {
-            return this.onCheckCreditsChosen(client);
-        }
-
         if (message.quick_reply.payload === ActionPayload.SendMessage) {
             return this.onSendMessageChosen(client);
         }
@@ -175,12 +171,6 @@ export class MessageHandler {
         await this.messageSender.send(client, {
             text: "Your messaged was delivered to the COCKpit!",
         });
-        await this.messageSender.displayPossibleActions(client);
-    }
-
-    private async onCheckCreditsChosen(client: Client): Promise<void> {
-        client.moveToState(ClientState.New);
-        await this.messageSender.send(client, { text: `You have ${coin(client.money)}` });
         await this.messageSender.displayPossibleActions(client);
     }
 

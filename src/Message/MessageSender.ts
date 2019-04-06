@@ -8,7 +8,7 @@ import {
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 
-export const coin = (value: number): string => `${value} Ƀ`;
+export const coin = (value: number): string => `Ƀ ${value}`;
 
 @injectable()
 export class MessageSender {
@@ -30,7 +30,7 @@ Pricing:
 - Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
 - Send message ${coin(MESSAGE_PIRCE)}
 
-What do you want to do?`,
+You have ${coin(client.money)} What do you want to do?`,
             quick_replies: [
                 {
                     content_type: "text",
@@ -51,12 +51,7 @@ What do you want to do?`,
                     content_type: "text",
                     title: "Send message",
                     payload: ActionPayload.SendMessage,
-                },
-                {
-                    content_type: "text",
-                    title: "Check credits",
-                    payload: ActionPayload.CheckCredits,
-                },
+                }
             ],
         });
     }
