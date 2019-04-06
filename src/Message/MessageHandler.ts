@@ -62,6 +62,8 @@ export class MessageHandler {
             return this.displayPossibleActions(client);
         }
 
+        // TODO Game not available
+
         if (client.state === ClientState.New) {
             return this.displayPossibleActions(client);
         }
@@ -191,9 +193,9 @@ export class MessageHandler {
         const tmpMoney = client.tmpMoney;
         client.tmpMoney = undefined;
 
-        const seconds = Math.min(parseInt(message.text), 1000);
+        const duration = Math.min(parseInt(message.text), 1000);
 
-        if (isNaN(seconds) || seconds < 1) {
+        if (isNaN(duration) || duration < 1) {
             return this.unknownSituation(client);
         }
 
@@ -206,9 +208,9 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, seconds));
+        this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, duration));
         await this.sendMessage(client, {
-            text: `You bet ${coin(money)} the game will last for at least ${seconds} seconds. Wish you luck!`,
+            text: `You bet ${coin(money)} the game will last for at least ${duration} seconds. Wish you luck!`,
         });
         await this.displayPossibleActions(client);
     }

@@ -3,18 +3,26 @@ import { GameManager } from "../Game/GameManager";
 import { ClientManager } from "../Client/ClientManager";
 import { Api } from "../Api";
 import { Client } from "../Client/Client";
+import { boundMethod } from "autobind-decorator";
 
 @injectable()
 export class ServerManager {
     constructor(
-        public readonly api: Api,
-        public readonly clientManager: ClientManager,
-        public readonly gameManager: GameManager,
+        private readonly api: Api,
+        private readonly clientManager: ClientManager,
+        private readonly gameManager: GameManager,
     ) {
         //
     }
 
-    // TODO Use it when new game starts.
+    @boundMethod
+    public startGame(): void {
+        for (const client of this.clientManager.clients) {
+            this.informClientAboutStart(client).catch(console.error);
+        }
+    }
+
+    @boundMethod
     public endGame(): void {
         for (const client of this.clientManager.clients) {
             this.informClientAboutEnd(client).catch(console.error);
@@ -24,8 +32,12 @@ export class ServerManager {
         this.gameManager.clear();
     }
 
+    private async informClientAboutStart(client: Client): Promise<void> {
+        await this.api.sendMessage(client.psid, { text: "New game has just started! Bet your MONEY!" });
+    }
+
     private async informClientAboutEnd(client: Client): Promise<void> {
-        await this.api.sendMessage(client.psid, { text: "Game has ended" });
-        // TODO Implement
+        await this.api.sendMessage(client.psid, { text: "Game has ended." });
+        // TODO Check bets
     }
 }

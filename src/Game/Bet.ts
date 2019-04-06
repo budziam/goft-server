@@ -9,7 +9,7 @@ export class Bet {
         public readonly psid: Psid,
         public readonly type: BetType,
         public readonly money: number,
-        public readonly seconds: number,
+        public readonly duration: number,
     ) {
         //
     }

@@ -1,44 +1,71 @@
 import { injectable } from "inversify";
 import { Socket } from "net";
 import { prependLength, splitData } from "./utils";
+import { ServerManager } from "./ServerManager";
+import { boundMethod } from "autobind-decorator";
+
+export enum MessageType {
+    Handshake = "handshake",
+    SwitchLightOff = "switch_light_off",
+    ChangeBulletColor = "change_bullet_color",
+    SendMessage = "send_message",
+    BetGameDuration = "bet_game_duration",
+}
 
 interface TcpMessage {
-    //
+    type: MessageType;
+    data?: any;
 }
 
 @injectable()
 export class ConnectionHandler {
+    private socket?: Socket;
+
     constructor(
-        private readonly socket: Socket,
+        private readonly serverManager: ServerManager,
     ) {
-        socket.setNoDelay(true);
+        //
     }
 
-    start() {
+    public start(socket: Socket): void {
+        if (socket !== undefined) {
+            this.close();
+        }
+
+        socket.setNoDelay(true);
+        this.socket = socket;
+
         this.socket
             // @ts-ignore
             .on('data', data => splitData(data, message => this.onMessage(JSON.parse(message))))
-            .on('close', () => {
-                // TODO Disconnect
-            })
+            .on('close', this.close)
             .on('error', error => {
-                // TODO Disconnect
                 console.error(error);
                 this.close();
             });
+
+        this.send({type: MessageType.Handshake});
+
+        this.serverManager.startGame();
     }
 
-    onMessage(message: TcpMessage) {
-        console.log("Found message " + message);
-    }
+    public send(message: TcpMessage): void {
+        if (this.socket === undefined) {
+            console.warn("Game is not started. Cannot send message.");
+            return;
+        }
 
-    send(message: TcpMessage) {
         this.socket.write(prependLength(JSON.stringify(message)));
     }
 
-    close() {
+    private onMessage(message: TcpMessage) {
+        console.log("Received message " + message);
+    }
+
+    @boundMethod
+    public close() {
+        this.serverManager.endGame();
         this.socket.end();
+        this.socket = undefined;
     }
 }
-
-module.exports = exports = ConnectionHandler;
