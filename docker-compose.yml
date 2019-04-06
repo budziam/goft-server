@@ -1,0 +1,19 @@
+version: '2'
+services:
+    nginx:
+        build:
+            context: ./docker
+            dockerfile: nginx.docker
+        volumes:
+            - ./data/nginx/certs:/etc/letsencrypt
+            - ./data/nginx/certs-data:/data/letsencrypt
+        ports:
+            - 80:80
+            - 443:443
+        links:
+            - server
+
+    server:
+        build:
+            context: ./docker
+            dockerfile: server.docker
