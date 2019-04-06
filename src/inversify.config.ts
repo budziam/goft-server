@@ -3,7 +3,7 @@ import axios from "axios";
 // @ts-ignore
 import * as env from "node-env-file";
 import { Container } from "inversify";
-import { ServerHttp } from "./ServerHttp";
+import { ServerHttp } from "./Server/ServerHttp";
 import { ErrorHandler } from "./ErrorHandler";
 import { WebhookCollection } from "./Controllers/WebhookCollection";
 import { Api } from "./Api";

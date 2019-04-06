@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
-import { GameManager } from "./Game/GameManager";
-import { ClientManager } from "./Client/ClientManager";
-import { Api } from "./Api";
-import { Client } from "./Client/Client";
+import { GameManager } from "../Game/GameManager";
+import { ClientManager } from "../Client/ClientManager";
+import { Api } from "../Api";
+import { Client } from "../Client/Client";
 
 @injectable()
 export class ServerManager {

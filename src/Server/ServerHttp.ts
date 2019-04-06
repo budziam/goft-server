@@ -6,9 +6,9 @@ import { NextFunction } from "express-serve-static-core";
 import * as http from "http";
 import { Server } from "http";
 import { Container, injectable } from "inversify";
-import { ErrorHandler } from "./ErrorHandler";
-import { EndpointNotFoundError } from "./Errors";
-import { WebhookCollection } from "./Controllers/WebhookCollection";
+import { ErrorHandler } from "../ErrorHandler";
+import { EndpointNotFoundError } from "../Errors";
+import { WebhookCollection } from "../Controllers/WebhookCollection";
 
 @injectable()
 @boundClass
@@ -84,7 +84,7 @@ export class ServerHttp {
         server.on("listening", () => {
             const address = server.address();
             // @ts-ignore
-            console.debug(`Listening on ${address.address}:${address.port}`);
+            console.log(`Server HTTP listening on ${address.address}:${address.port}`);
         });
 
         server.on("error", this.errorHandler.handle);
