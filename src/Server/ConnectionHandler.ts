@@ -71,11 +71,13 @@ export class ConnectionHandler {
     public close() {
         console.info("Close connection with game!");
 
-        this.socket.end();
-        this.socket = undefined;
+        if (this.socket !== undefined) {
+            this.socket.end();
+            this.socket = undefined;
 
-        if (this.onClose) {
-            this.onClose();
+            if (this.onClose) {
+                this.onClose();
+            }
         }
     }
 
