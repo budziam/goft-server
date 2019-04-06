@@ -68,9 +68,14 @@ export class ServerHttp {
         );
 
         app.use((req, res, next) => next(new EndpointNotFoundError()));
-        app.use(this.errorHandler.handleHttpError);
+        app.use(this.handleError);
 
         return app;
+    }
+
+    private handleError(e: object, req: Request, res: Response, next: NextFunction): void {
+        this.errorHandler.handleHttpError(e, req, res);
+        next();
     }
 
     private startServer(): Server {
