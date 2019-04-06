@@ -1,6 +1,8 @@
 import { Psid } from "../Message/types";
 import { Client } from "./Client";
+import { injectable } from "inversify";
 
+@injectable()
 export class ClientManager {
     private readonly clients: Map<Psid, Client> = new Map();
 
