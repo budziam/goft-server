@@ -197,7 +197,7 @@ export class MessageHandler {
         }
 
         client.moveToState(ClientState.New);
-        const money = tmpMoney === ALL_IN ? client.money : parseInt(client.tmpMoney);
+        const money = tmpMoney === ALL_IN ? client.money : parseInt(tmpMoney);
 
         try {
             await this.charge(client, money);
@@ -287,12 +287,12 @@ What do you want to do?`,
                 {
                     content_type: "text",
                     title: coin(5),
-                    payload: "50",
+                    payload: "5",
                 },
                 {
                     content_type: "text",
                     title: coin(10),
-                    payload: "50",
+                    payload: "10",
                 },
                 {
                     content_type: "text",
