@@ -27,4 +27,9 @@ export class GameManager {
         // TODO Send info to game
         console.info("Switch off the lights!");
     }
+
+    public sendMessage(text: string) {
+        // TODO Send info to game
+        console.info(`Someone send message [${text}]!`);
+    }
 }

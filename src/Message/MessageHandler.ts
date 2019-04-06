@@ -20,6 +20,8 @@ enum ActionPayload {
     BetGameDuration = "bet-game-duration",
     BulletColor = "bullet-color",
     SwitchLightsOff = "switch-lights-off",
+    CheckCredits = "check-credits",
+    SendMessage = "send-message",
 }
 
 enum BulletColorPayload {
@@ -32,6 +34,10 @@ const ALL_IN = "all-in";
 
 const SWITCH_LIGHTS_OFF_PIRCE = 30;
 const BULLET_COLOR_PIRCE = 30;
+const MESSAGE_PIRCE = 30;
+
+const coin = (value: number): string => `${value} Ƀ`;
+const trunc = (text: string, n = 32) => text.length > n ? text.substr(0, n - 1) + '...' : text;
 
 @injectable()
 export class MessageHandler {
@@ -47,11 +53,11 @@ export class MessageHandler {
         const client = this.clientManager.get(psid);
 
         if (message.text === "elo") {
-            return this.sendMessage(client, { text: "No siemka ziomek" });
+            return this.sendMessage(client, {text: "No siemka ziomek"});
         }
 
         if (message.text === "cancel") {
-            this.sendMessage(client, { text: "Let's start from the beginning..." });
+            this.sendMessage(client, {text: "Let's start from the beginning..."});
             return this.displayPossibleActions(client);
         }
 
@@ -75,6 +81,10 @@ export class MessageHandler {
             return this.onGameDurationChosen(client, message);
         }
 
+        if (client.state === ClientState.TypeMessage) {
+            return this.onMessageTyped(client, message);
+        }
+
         return this.unknownSituation(client);
     }
 
@@ -89,6 +99,14 @@ export class MessageHandler {
 
         if (message.quick_reply.payload === ActionPayload.SwitchLightsOff) {
             return this.onSwitchLightsOffChosen(client);
+        }
+
+        if (message.quick_reply.payload === ActionPayload.CheckCredits) {
+            return this.onCheckCreditsChosen(client);
+        }
+
+        if (message.quick_reply.payload === ActionPayload.SendMessage) {
+            return this.onSendMessageChosen(client);
         }
 
         if (message.quick_reply.payload === ActionPayload.BetGameDuration) {
@@ -109,7 +127,7 @@ export class MessageHandler {
         try {
             this.charge(client, BULLET_COLOR_PIRCE);
             this.gameManager.modifyColor(message.quick_reply.payload);
-            this.sendMessage(client, { text: "The bullets look as you wish :)" });
+            this.sendMessage(client, {text: "The bullets look as you wish :)"});
         } catch (e) {
             this.handleChargeException(client, e);
         }
@@ -121,10 +139,31 @@ export class MessageHandler {
         try {
             this.charge(client, SWITCH_LIGHTS_OFF_PIRCE);
             this.gameManager.switchOffLights();
-            this.sendMessage(client, { text: "The lights went off. Ups..." });
+            this.sendMessage(client, {text: "The lights went off. Ups..."});
         } catch (e) {
             this.handleChargeException(client, e);
         }
+    }
+
+    private onSendMessageChosen(client: Client): void {
+        client.moveToState(ClientState.TypeMessage);
+        this.sendMessage(client, {text: "Type your message, no longer than 32 characters:"});
+    }
+
+    private onMessageTyped(client: Client, message: EventMessage): void {
+        client.moveToState(ClientState.New);
+
+        try {
+            this.charge(client, MESSAGE_PIRCE);
+            this.gameManager.sendMessage(trunc(message.text));
+            this.sendMessage(client, {text: "Your messaged was delivered to the COCKpit!"});
+        } catch (e) {
+            this.handleChargeException(client, e);
+        }
+    }
+
+    private onCheckCreditsChosen(client: Client): void {
+        this.sendMessage(client, {text: `You have ${coin(client.money)}`});
     }
 
     private onGameDurationMoneyChosen(client: Client, message: EventMessage): void {
@@ -156,7 +195,7 @@ export class MessageHandler {
             this.charge(client, money);
             this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, seconds));
             this.sendMessage(client, {
-                text: `You bet ${money} Ƀ the game will last for at least ${seconds} seconds.`,
+                text: `You bet ${coin(money)} the game will last for at least ${seconds} seconds.`,
             });
         } catch (e) {
             this.handleChargeException(client, e);
@@ -165,6 +204,7 @@ export class MessageHandler {
 
     private displayPossibleActions(client: Client): void {
         client.moveToState(ClientState.ActionDecision);
+        this.sendMessage(client, {text: "You can always type `cancel` to start from the beginning"});
         this.sendMessage(client, {
             text: "What do you want to do?",
             quick_replies: [
@@ -175,13 +215,23 @@ export class MessageHandler {
                 },
                 {
                     content_type: "text",
-                    title: "Modify bullet color",
+                    title: `${coin(BULLET_COLOR_PIRCE)} Modify bullet color`,
                     payload: ActionPayload.BulletColor,
                 },
                 {
                     content_type: "text",
-                    title: "Switch lights off",
+                    title: `${coin(SWITCH_LIGHTS_OFF_PIRCE)} Switch lights off`,
                     payload: ActionPayload.SwitchLightsOff,
+                },
+                {
+                    content_type: "text",
+                    title: `${coin(MESSAGE_PIRCE)} Send message`,
+                    payload: ActionPayload.SendMessage,
+                },
+                {
+                    content_type: "text",
+                    title: "Check credits",
+                    payload: ActionPayload.CheckCredits,
                 },
             ],
         });
@@ -220,17 +270,17 @@ export class MessageHandler {
             quick_replies: [
                 {
                     content_type: "text",
-                    title: "5 Ƀ",
+                    title: coin(5),
                     payload: "50",
                 },
                 {
                     content_type: "text",
-                    title: "10 Ƀ",
+                    title: coin(10),
                     payload: "50",
                 },
                 {
                     content_type: "text",
-                    title: "50 Ƀ",
+                    title: coin(50),
                     payload: "50",
                 },
                 {
@@ -253,7 +303,7 @@ export class MessageHandler {
     private handleChargeException(client: Client, e: any): void {
         if (e instanceof NotEnoughMoneyError) {
             return this.sendMessage(client, {
-                text: `Your credits ${client.money} Ƀ are not enough ¯\\_(ツ)_/¯`,
+                text: `Your credits ${coin(client.money)} are not enough ¯\\_(ツ)_/¯`,
             });
         }
 
@@ -262,7 +312,7 @@ export class MessageHandler {
 
     private charge(client: Client, money: number): void {
         client.charge(money);
-        this.sendMessage(client, { text: `You were charged ${money} Ƀ` });
+        this.sendMessage(client, {text: `You were charged ${coin(money)}`});
     }
 
     private sendMessage(client: Client, message: MeMessage): void {
