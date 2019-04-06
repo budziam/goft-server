@@ -1,16 +1,16 @@
 import { injectable } from "inversify";
 import { GameManager } from "../Game/GameManager";
 import { ClientManager } from "../Client/ClientManager";
-import { Api } from "../Api";
 import { Client } from "../Client/Client";
 import { boundMethod } from "autobind-decorator";
+import { MessageSender } from "../Message/MessageSender";
 
 @injectable()
 export class ServerManager {
     constructor(
-        private readonly api: Api,
         private readonly clientManager: ClientManager,
         private readonly gameManager: GameManager,
+        private readonly messageSender: MessageSender,
     ) {
         //
     }
@@ -33,11 +33,14 @@ export class ServerManager {
     }
 
     private async informClientAboutStart(client: Client): Promise<void> {
-        await this.api.sendMessage(client.psid, { text: "New game has just started! Bet your MONEY!" });
+        await this.messageSender.send(client, {
+            text: "New game has just started! Bet your MONEY!",
+        });
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async informClientAboutEnd(client: Client): Promise<void> {
-        await this.api.sendMessage(client.psid, { text: "Game has ended." });
+        await this.messageSender.send(client, { text: "Game has ended." });
         // TODO Check bets
     }
 }

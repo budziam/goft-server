@@ -21,14 +21,12 @@ interface TcpMessage {
 export class ConnectionHandler {
     private socket?: Socket;
 
-    constructor(
-        private readonly serverManager: ServerManager,
-    ) {
+    constructor(private readonly serverManager: ServerManager) {
         //
     }
 
     public start(socket: Socket): void {
-        if (socket !== undefined) {
+        if (this.isLive()) {
             this.close();
         }
 
@@ -37,20 +35,20 @@ export class ConnectionHandler {
 
         this.socket
             // @ts-ignore
-            .on('data', data => splitData(data, message => this.onMessage(JSON.parse(message))))
-            .on('close', this.close)
-            .on('error', error => {
+            .on("data", data => splitData(data, message => this.onMessage(JSON.parse(message))))
+            .on("close", this.close)
+            .on("error", error => {
                 console.error(error);
                 this.close();
             });
 
-        this.send({type: MessageType.Handshake});
+        this.send({ type: MessageType.Handshake });
 
         this.serverManager.startGame();
     }
 
     public send(message: TcpMessage): void {
-        if (this.socket === undefined) {
+        if (!this.isLive()) {
             console.warn("Game is not started. Cannot send message.");
             return;
         }
@@ -67,5 +65,9 @@ export class ConnectionHandler {
         this.serverManager.endGame();
         this.socket.end();
         this.socket = undefined;
+    }
+
+    public isLive(): boolean {
+        return this.socket !== undefined;
     }
 }

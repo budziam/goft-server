@@ -7,9 +7,7 @@ export class GameManager {
     private bulletColor: string;
     private bets: Bet[] = [];
 
-    constructor(
-        private readonly connectionHandler: ConnectionHandler,
-    ) {
+    constructor(private readonly connectionHandler: ConnectionHandler) {
         //
     }
 
@@ -17,7 +15,7 @@ export class GameManager {
         this.bulletColor = color;
         this.connectionHandler.send({
             type: MessageType.ChangeBulletColor,
-            data: {color},
+            data: { color },
         });
         console.info(`Color of bullets has changed to [${this.bulletColor}]`);
     }
@@ -44,7 +42,7 @@ export class GameManager {
     public sendMessage(text: string) {
         this.connectionHandler.send({
             type: MessageType.SendMessage,
-            data: {text},
+            data: { text },
         });
         console.info(`Someone send message [${text}]!`);
     }

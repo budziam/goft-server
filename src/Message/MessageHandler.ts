@@ -1,11 +1,18 @@
 import { injectable } from "inversify";
 import { Psid } from "./types";
 import { ClientManager } from "../Client/ClientManager";
-import { Api, MeMessage } from "../Api";
 import { Client, ClientState } from "../Client/Client";
 import { GameManager } from "../Game/GameManager";
 import { Bet, BetType } from "../Game/Bet";
 import { NotEnoughMoneyError } from "../Errors/NotEnoughMoneyError";
+import { ConnectionHandler } from "../Server/ConnectionHandler";
+import {
+    ActionPayload,
+    BULLET_COLOR_PIRCE,
+    MESSAGE_PIRCE,
+    SWITCH_LIGHTS_OFF_PIRCE,
+} from "./constants";
+import { coin, MessageSender } from "./MessageSender";
 
 interface MessageQuickReply {
     payload: string;
@@ -16,14 +23,6 @@ export interface EventMessage {
     quick_reply?: MessageQuickReply;
 }
 
-enum ActionPayload {
-    BetGameDuration = "bet-game-duration",
-    BulletColor = "bullet-color",
-    SwitchLightsOff = "switch-lights-off",
-    CheckCredits = "check-credits",
-    SendMessage = "send-message",
-}
-
 enum BulletColorPayload {
     Red = "#FF0000",
     Green = "#00FF00",
@@ -32,19 +31,15 @@ enum BulletColorPayload {
 
 const ALL_IN = "all-in";
 
-const SWITCH_LIGHTS_OFF_PIRCE = 30;
-const BULLET_COLOR_PIRCE = 30;
-const MESSAGE_PIRCE = 30;
-
-const coin = (value: number): string => `${value} Ƀ`;
 const trunc = (text: string, n = 32) => (text.length > n ? text.substr(0, n - 1) + "..." : text);
 
 @injectable()
 export class MessageHandler {
     constructor(
-        private readonly api: Api,
         private readonly clientManager: ClientManager,
+        private readonly connectionHandler: ConnectionHandler,
         private readonly gameManager: GameManager,
+        private readonly messageSender: MessageSender,
     ) {
         //
     }
@@ -54,18 +49,22 @@ export class MessageHandler {
         const text = message.text.toLowerCase();
 
         if (text === "elo") {
-            return this.sendMessage(client, { text: "No siemka ziomek" });
+            return this.messageSender.send(client, { text: "No siemka ziomek" });
+        }
+
+        if (!this.connectionHandler.isLive()) {
+            return this.messageSender.send(client, {
+                text: "Game has not started yet. Please wait.",
+            });
         }
 
         if (text === "cancel") {
-            await this.api.sendMessage(client.psid, { text: "Let's start from the beginning..." });
-            return this.displayPossibleActions(client);
+            await this.messageSender.send(client, { text: "Let's start from the beginning..." });
+            return this.messageSender.displayPossibleActions(client);
         }
 
-        // TODO Game not available
-
         if (client.state === ClientState.New) {
-            return this.displayPossibleActions(client);
+            return this.messageSender.displayPossibleActions(client);
         }
 
         if (client.state === ClientState.ActionDecision) {
@@ -134,8 +133,8 @@ export class MessageHandler {
         }
 
         this.gameManager.modifyColor(message.quick_reply.payload);
-        await this.sendMessage(client, { text: "The bullets look as you wish :)" });
-        await this.displayPossibleActions(client);
+        await this.messageSender.send(client, { text: "The bullets look as you wish :)" });
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async onSwitchLightsOffChosen(client: Client): Promise<void> {
@@ -148,13 +147,15 @@ export class MessageHandler {
         }
 
         this.gameManager.switchOffLights();
-        await this.sendMessage(client, { text: "The lights went off. Ups..." });
-        await this.displayPossibleActions(client);
+        await this.messageSender.send(client, { text: "The lights went off. Ups..." });
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async onSendMessageChosen(client: Client): Promise<void> {
         client.moveToState(ClientState.TypeMessage);
-        await this.sendMessage(client, { text: "Type your message, no longer than 32 characters:" });
+        await this.messageSender.send(client, {
+            text: "Type your message, no longer than 32 characters:",
+        });
     }
 
     private async onMessageTyped(client: Client, message: EventMessage): Promise<void> {
@@ -167,14 +168,16 @@ export class MessageHandler {
         }
 
         this.gameManager.sendMessage(trunc(message.text));
-        await this.sendMessage(client, { text: "Your messaged was delivered to the COCKpit!" });
-        await this.displayPossibleActions(client);
+        await this.messageSender.send(client, {
+            text: "Your messaged was delivered to the COCKpit!",
+        });
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async onCheckCreditsChosen(client: Client): Promise<void> {
         client.moveToState(ClientState.New);
-        await this.sendMessage(client, { text: `You have ${coin(client.money)}` });
-        await this.displayPossibleActions(client);
+        await this.messageSender.send(client, { text: `You have ${coin(client.money)}` });
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async onGameDurationMoneyChosen(client: Client, message: EventMessage): Promise<void> {
@@ -184,7 +187,7 @@ export class MessageHandler {
 
         client.tmpMoney = message.quick_reply.payload;
         client.moveToState(ClientState.ChooseGameDuration);
-        await this.sendMessage(client, {
+        await this.messageSender.send(client, {
             text: "Tell me, in seconds, how long the game will last at least?",
         });
     }
@@ -209,56 +212,17 @@ export class MessageHandler {
         }
 
         this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, duration));
-        await this.sendMessage(client, {
-            text: `You bet ${coin(money)} the game will last for at least ${duration} seconds. Wish you luck!`,
+        await this.messageSender.send(client, {
+            text: `You bet ${coin(
+                money,
+            )} the game will last for at least ${duration} seconds. Wish you luck!`,
         });
-        await this.displayPossibleActions(client);
-    }
-
-    private async displayPossibleActions(client: Client): Promise<void> {
-        client.moveToState(ClientState.ActionDecision);
-        await this.sendMessage(client, {
-            text: `Hint: you can always type \`cancel\` to start from the beginning
-
-Pricing:
-- Modify bullet color ${coin(BULLET_COLOR_PIRCE)}
-- Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
-- Send message ${coin(MESSAGE_PIRCE)}
-
-What do you want to do?`,
-            quick_replies: [
-                {
-                    content_type: "text",
-                    title: "Bet game duration",
-                    payload: ActionPayload.BetGameDuration,
-                },
-                {
-                    content_type: "text",
-                    title: "Modify bullet color",
-                    payload: ActionPayload.BulletColor,
-                },
-                {
-                    content_type: "text",
-                    title: "Switch lights off",
-                    payload: ActionPayload.SwitchLightsOff,
-                },
-                {
-                    content_type: "text",
-                    title: "Send message",
-                    payload: ActionPayload.SendMessage,
-                },
-                {
-                    content_type: "text",
-                    title: "Check credits",
-                    payload: ActionPayload.CheckCredits,
-                },
-            ],
-        });
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async displayPossibleBulletColors(client: Client): Promise<void> {
         client.moveToState(ClientState.ChooseBulletColor);
-        await this.sendMessage(client, {
+        await this.messageSender.send(client, {
             text: "Select color of bullets",
             quick_replies: [
                 {
@@ -284,7 +248,7 @@ What do you want to do?`,
     }
 
     private async displayPossibleBetRates(client: Client): Promise<void> {
-        await this.sendMessage(client, {
+        await this.messageSender.send(client, {
             text: "How much do you want to bet?",
             quick_replies: [
                 {
@@ -313,18 +277,18 @@ What do you want to do?`,
 
     private async unknownSituation(client: Client): Promise<void> {
         client.moveToState(ClientState.New);
-        await this.sendMessage(client, {
+        await this.messageSender.send(client, {
             text: "I've got trouble with understanding you. Let's start from the beginning...",
         });
-        await this.displayPossibleActions(client);
+        await this.messageSender.displayPossibleActions(client);
     }
 
     private async handleChargeException(client: Client, e: any): Promise<void> {
         if (e instanceof NotEnoughMoneyError) {
-            await this.sendMessage(client, {
+            await this.messageSender.send(client, {
                 text: `Your credits ${coin(client.money)} are not enough ¯\\_(ツ)_/¯`,
             });
-            return this.displayPossibleActions(client);
+            return this.messageSender.displayPossibleActions(client);
         }
 
         throw e;
@@ -332,10 +296,6 @@ What do you want to do?`,
 
     private async charge(client: Client, money: number): Promise<void> {
         client.charge(money);
-        await this.sendMessage(client, { text: `You were charged ${coin(money)}` });
-    }
-
-    private async sendMessage(client: Client, message: MeMessage): Promise<void> {
-        await this.api.sendMessage(client.psid, message);
+        await this.messageSender.send(client, { text: `You were charged ${coin(money)}` });
     }
 }

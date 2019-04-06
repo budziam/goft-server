@@ -18,13 +18,13 @@ export const prependLength = (message: string): Buffer => {
     const length = message.length;
 
     const lengthArray = new Uint8Array([
-        (length & 0x000000ff),
+        length & 0x000000ff,
         (length & 0x0000ff00) >> 8,
         (length & 0x00ff0000) >> 16,
-        (length & 0xff000000) >> 24
+        (length & 0xff000000) >> 24,
     ]);
 
-    const messageBuffer = Buffer.from(message, 'utf8');
+    const messageBuffer = Buffer.from(message, "utf8");
 
     const output = new Uint8Array(lengthArray.byteLength + messageBuffer.byteLength);
     output.set(lengthArray, 0);

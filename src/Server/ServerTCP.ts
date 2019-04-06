@@ -10,7 +10,7 @@ export class ServerTCP {
 
     constructor(
         private readonly connectionHandler: ConnectionHandler,
-        private readonly address = '0.0.0.0',
+        private readonly address = "0.0.0.0",
         private readonly port = 3000,
     ) {
         //
@@ -19,9 +19,9 @@ export class ServerTCP {
     public start(): void {
         const server = net.createServer();
 
-        server.on('connection', this.onConnection);
-        server.on('error', console.error);
-        server.on('listening', () => {
+        server.on("connection", this.onConnection);
+        server.on("error", console.error);
+        server.on("listening", () => {
             const address = server.address();
             // @ts-ignore
             console.log(`Server TCP listening on ${address.address}:${address.port}`);
