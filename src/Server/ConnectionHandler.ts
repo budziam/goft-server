@@ -44,6 +44,8 @@ export class ConnectionHandler {
         if (this.onStart) {
             this.onStart();
         }
+
+        console.info("New connection from game!");
     }
 
     public send(message: TcpMessage): void {
@@ -61,6 +63,8 @@ export class ConnectionHandler {
 
     @boundMethod
     public close() {
+        console.info("Close connection with game!");
+
         this.socket.end();
         this.socket = undefined;
 
