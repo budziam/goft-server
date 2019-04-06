@@ -46,9 +46,9 @@ export class MessageHandler {
 
     public async handle(psid: Psid, message: EventMessage): Promise<void> {
         const client = this.clientManager.get(psid);
-        const text = message.text.toLowerCase();
+        message.text = message.text.toLowerCase().trim();
 
-        if (text === "elo") {
+        if (message.text === "elo") {
             return this.messageSender.send(client, { text: "No siemka ziomek" });
         }
 
@@ -58,7 +58,7 @@ export class MessageHandler {
             });
         }
 
-        if (text === "cancel") {
+        if (message.text === "cancel") {
             await this.messageSender.send(client, { text: "Let's start from the beginning..." });
             return this.messageSender.displayPossibleActions(client);
         }
@@ -120,11 +120,13 @@ export class MessageHandler {
     }
 
     private async onBulletColorChosen(client: Client, message: EventMessage): Promise<void> {
-        // TODO Handle custom colors
+        const text = message.quick_reply ? message.quick_reply.payload : message.text;
 
-        if (!message.quick_reply) {
+        if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(message.text)) {
             return this.unknownSituation(client);
         }
+
+        const color = text.replace(/^#?/, "#");
 
         client.moveToState(ClientState.New);
 
@@ -134,7 +136,7 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        this.gameManager.modifyColor(message.quick_reply.payload);
+        this.gameManager.modifyColor(color);
         await this.messageSender.send(client, { text: "The bullets look as you wish :)" });
         await this.messageSender.displayPossibleActions(client);
     }
@@ -183,33 +185,60 @@ export class MessageHandler {
     }
 
     private async onGameDurationMoneyChosen(client: Client, message: EventMessage): Promise<void> {
-        // TODO Handle custom money
+        const money = message.quick_reply ? message.quick_reply.payload : message.text;
 
-        if (!message.quick_reply) {
+        if (money !== ALL_IN && isNaN(parseInt(money))) {
             return this.unknownSituation(client);
         }
 
-        client.tmpMoney = message.quick_reply.payload;
+        client.tmpMoney = money;
         client.moveToState(ClientState.ChooseGameDuration);
-        // TODO Suggest seconds
         await this.messageSender.send(client, {
             text: "Tell me, in seconds, how long the game will last at least?",
+            quick_replies: [
+                {
+                    content_type: "text",
+                    title: "5",
+                    payload: "5",
+                },
+                {
+                    content_type: "text",
+                    title: "10",
+                    payload: "10",
+                },
+                {
+                    content_type: "text",
+                    title: "20",
+                    payload: "20",
+                },
+                {
+                    content_type: "text",
+                    title: "40",
+                    payload: "40",
+                },
+                {
+                    content_type: "text",
+                    title: "60",
+                    payload: "60",
+                },
+            ]
         });
     }
 
     private async onGameDurationChosen(client: Client, message: EventMessage): Promise<void> {
-        // TODO Handle quick replies
-
         const tmpMoney = client.tmpMoney;
         client.tmpMoney = undefined;
 
-        const duration = Math.min(parseInt(message.text), 1000);
+        const text = message.quick_reply ? message.quick_reply.payload : message.text;
+        const parsedDuration = parseInt(text);
 
-        if (isNaN(duration) || duration < 1) {
+        if (isNaN(parsedDuration) || parsedDuration < 1) {
             return this.unknownSituation(client);
         }
 
         client.moveToState(ClientState.New);
+
+        const duration = Math.min(parsedDuration, 1000);
         const money = tmpMoney === ALL_IN ? client.money : parseInt(tmpMoney);
 
         try {
