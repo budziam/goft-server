@@ -10,7 +10,6 @@
     "noImplicitReturns": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": true,
     "sourceMap": false
   }
 }
