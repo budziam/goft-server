@@ -4,13 +4,21 @@ import { injectable } from "inversify";
 
 @injectable()
 export class ClientManager {
-    private readonly clients: Map<Psid, Client> = new Map();
+    public readonly _clients: Map<Psid, Client> = new Map();
+
+    public get clients(): Client[] {
+        return [...this._clients.values()];
+    }
 
     public get(psid: Psid): Client {
-        if (!this.clients.has(psid)) {
-            this.clients.set(psid, new Client(psid));
+        if (!this._clients.has(psid)) {
+            this._clients.set(psid, new Client(psid));
         }
 
-        return this.clients.get(psid);
+        return this._clients.get(psid);
+    }
+
+    public clear(): void {
+        this._clients.clear();
     }
 }

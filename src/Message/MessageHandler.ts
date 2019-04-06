@@ -4,6 +4,7 @@ import { ClientManager } from "../Client/ClientManager";
 import { Api } from "../Api";
 import { Client, ClientState } from "../Client/Client";
 import { GameManager } from "../Game/GameManager";
+import { Bet, BetType } from "../Game/Bet";
 
 interface MessageQuickReply {
     payload: string;
@@ -54,6 +55,10 @@ export class MessageHandler {
             return this.handleBulletColorChosen(client, message);
         }
 
+        if (client.state === ClientState.ChooseGameEndSeconds) {
+            return this.handleGameEndSecondsChosen(client, message);
+        }
+
         return this.unknownSituation(client);
     }
 
@@ -87,10 +92,9 @@ export class MessageHandler {
         }
 
         if (message.quick_reply.payload === ActionPayload.BetGameEnd) {
-            // TODO Implement it
-            client.moveToState(ClientState.New);
+            client.moveToState(ClientState.ChooseGameEndSeconds);
             return this.api.sendMessage(client.psid, {
-                text: "You want to bet, huh? Sorry, not implemented yet.",
+                text: "Tell me, in seconds, how long will this game last?",
             });
         }
 
@@ -132,6 +136,20 @@ export class MessageHandler {
         client.moveToState(ClientState.New);
         this.gameManager.modifyColor(message.quick_reply.payload);
         return this.api.sendMessage(client.psid, { text: "The bullets look as you wish" });
+    }
+
+    private async handleGameEndSecondsChosen(client: Client, message: EventMessage): Promise<void> {
+        const seconds = Math.min(parseInt(message.text), 1000);
+
+        if (isNaN(seconds)) {
+            return this.unknownSituation(client);
+        }
+
+        client.moveToState(ClientState.New);
+        this.gameManager.bet(new Bet(client.psid, BetType.GameEnd, seconds));
+        return this.api.sendMessage(client.psid, {
+            text: `You bet game will end in ${seconds} seconds.`,
+        });
     }
 
     private async unknownSituation(client: Client): Promise<void> {

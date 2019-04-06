@@ -4,6 +4,7 @@ export enum ClientState {
     New = 1,
     ActionDecision,
     ChooseBulletColor,
+    ChooseGameEndSeconds,
 }
 
 export class Client {
