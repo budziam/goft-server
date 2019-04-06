@@ -208,12 +208,12 @@ export class MessageHandler {
             text: "You can always type `cancel` to start from the beginning",
         });
         await this.sendMessage(client, {
-            text: `What do you want to do?\n
-            \n
-            Pricing:\n
-            - Modify bullet color ${coin(BULLET_COLOR_PIRCE)}\n
-            - Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}\n
-            - Send message ${coin(MESSAGE_PIRCE)}`,
+            text: `What do you want to do?
+            
+Pricing:
+- Modify bullet color ${coin(BULLET_COLOR_PIRCE)}
+- Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
+- Send message ${coin(MESSAGE_PIRCE)}`,
             quick_replies: [
                 {
                     content_type: "text",
