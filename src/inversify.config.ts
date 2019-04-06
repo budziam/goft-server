@@ -1,10 +1,16 @@
 import "reflect-metadata";
+import axios from "axios";
+// @ts-ignore
+import * as env from "node-env-file";
 import { Container } from "inversify";
 import { ServerHttp } from "./ServerHttp";
 import { ErrorHandler } from "./ErrorHandler";
 import { WebhookCollection } from "./Controllers/WebhookCollection";
+import { Api } from "./Api";
 
 export const createContainer = (): Container => {
+    env(`${__dirname}/../.env`);
+
     const container = new Container({ autoBindInjectable: true });
 
     container.bind(Container).toConstantValue(container);
@@ -21,9 +27,13 @@ export const createContainer = (): Container => {
         .inSingletonScope();
 
     container
-        .bind(WebhookCollection)
-        .toDynamicValue(() => new WebhookCollection("uper-secret"))
+        .bind(Api)
+        .toDynamicValue(() => new Api(axios, process.env.FB_ACCESS_TOKEN))
         .inSingletonScope();
+
+    container
+        .bind(WebhookCollection)
+        .toDynamicValue(() => new WebhookCollection(process.env.FB_VERIFY_TOKEN));
 
     return container;
 };

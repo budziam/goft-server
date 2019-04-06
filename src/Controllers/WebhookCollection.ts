@@ -6,9 +6,7 @@ import { EndpointNotFoundError } from "../Errors";
 @injectable()
 @boundClass
 export class WebhookCollection {
-    constructor(
-        private readonly token: string,
-    ) {
+    constructor(private readonly token: string) {
         //
     }
 
@@ -41,13 +39,12 @@ export class WebhookCollection {
         const body = req.body;
 
         // Checks this is an event from a page subscription
-        if (body.object !== 'page') {
+        if (body.object !== "page") {
             throw new EndpointNotFoundError();
         }
 
         // Iterates over each entry - there may be multiple if batched
         body.entry.forEach((entry: any) => {
-
             // Gets the message. entry.messaging is an array, but
             // will only ever contain one message, so we get index 0
             const webhook_event = entry.messaging[0];
@@ -55,6 +52,6 @@ export class WebhookCollection {
         });
 
         // Returns a '200 OK' response to all requests
-        res.status(200).send('EVENT_RECEIVED');
+        res.status(200).send("EVENT_RECEIVED");
     }
 }
