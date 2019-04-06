@@ -1,7 +1,6 @@
 import { injectable } from "inversify";
 import { Socket } from "net";
 import { prependLength, splitData } from "./utils";
-import { ServerManager } from "./ServerManager";
 import { boundMethod } from "autobind-decorator";
 
 export enum MessageType {
@@ -20,10 +19,8 @@ interface TcpMessage {
 @injectable()
 export class ConnectionHandler {
     private socket?: Socket;
-
-    constructor(private readonly serverManager: ServerManager) {
-        //
-    }
+    public onStart?: Function;
+    public onClose?: Function;
 
     public start(socket: Socket): void {
         if (this.isLive()) {
@@ -44,7 +41,9 @@ export class ConnectionHandler {
 
         this.send({ type: MessageType.Handshake });
 
-        this.serverManager.startGame();
+        if (this.onStart) {
+            this.onStart();
+        }
     }
 
     public send(message: TcpMessage): void {
@@ -62,9 +61,12 @@ export class ConnectionHandler {
 
     @boundMethod
     public close() {
-        this.serverManager.endGame();
         this.socket.end();
         this.socket = undefined;
+
+        if (this.onClose) {
+            this.onClose();
+        }
     }
 
     public isLive(): boolean {

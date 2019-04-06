@@ -120,6 +120,8 @@ export class MessageHandler {
     }
 
     private async onBulletColorChosen(client: Client, message: EventMessage): Promise<void> {
+        // TODO Handle custom colors
+
         if (!message.quick_reply) {
             return this.unknownSituation(client);
         }
@@ -181,18 +183,23 @@ export class MessageHandler {
     }
 
     private async onGameDurationMoneyChosen(client: Client, message: EventMessage): Promise<void> {
+        // TODO Handle custom money
+
         if (!message.quick_reply) {
             return this.unknownSituation(client);
         }
 
         client.tmpMoney = message.quick_reply.payload;
         client.moveToState(ClientState.ChooseGameDuration);
+        // TODO Suggest seconds
         await this.messageSender.send(client, {
             text: "Tell me, in seconds, how long the game will last at least?",
         });
     }
 
     private async onGameDurationChosen(client: Client, message: EventMessage): Promise<void> {
+        // TODO Handle quick replies
+
         const tmpMoney = client.tmpMoney;
         client.tmpMoney = undefined;
 

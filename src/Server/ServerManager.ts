@@ -4,6 +4,7 @@ import { ClientManager } from "../Client/ClientManager";
 import { Client, INITIAL_MONEY } from "../Client/Client";
 import { boundMethod } from "autobind-decorator";
 import { coin, MessageSender } from "../Message/MessageSender";
+import { ConnectionHandler } from "./ConnectionHandler";
 
 @injectable()
 export class ServerManager {
@@ -11,8 +12,10 @@ export class ServerManager {
         private readonly clientManager: ClientManager,
         private readonly gameManager: GameManager,
         private readonly messageSender: MessageSender,
+        private readonly connectionHandler: ConnectionHandler,
     ) {
-        //
+        this.connectionHandler.onStart = this.startGame;
+        this.connectionHandler.onClose = this.endGame;
     }
 
     @boundMethod
@@ -49,6 +52,6 @@ export class ServerManager {
             text += `You won ${coin(result)} 🔥🔥🔥 FUCKING AWESOME 🔥🔥🔥`;
         }
 
-        await this.messageSender.send(client, { text });
+        await this.messageSender.send(client, {text});
     }
 }
