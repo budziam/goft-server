@@ -12,10 +12,12 @@ export enum ClientState {
     TypeMessage,
 }
 
+export const INITIAL_MONEY = 100;
+
 export class Client {
     private readonly _psid: Psid;
     private _state: ClientState = ClientState.New;
-    private _money: number = 100;
+    private _money: number = INITIAL_MONEY;
 
     public tmpMoney?: string;
 
@@ -45,5 +47,9 @@ export class Client {
         }
 
         this._money -= money;
+    }
+
+    public topUp(money: number): void {
+        this._money += money;
     }
 }

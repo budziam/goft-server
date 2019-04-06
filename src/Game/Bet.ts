@@ -1,4 +1,4 @@
-import { Psid } from "../Message/types";
+import { Client } from "../Client/Client";
 
 export enum BetType {
     GameDuration = 1,
@@ -6,7 +6,7 @@ export enum BetType {
 
 export class Bet {
     constructor(
-        public readonly psid: Psid,
+        public readonly client: Client,
         public readonly type: BetType,
         public readonly money: number,
         public readonly duration: number,

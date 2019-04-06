@@ -211,7 +211,7 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, duration));
+        this.gameManager.bet(new Bet(client, BetType.GameDuration, money, duration));
         await this.messageSender.send(client, {
             text: `You bet ${coin(
                 money,

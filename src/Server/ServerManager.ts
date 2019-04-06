@@ -1,9 +1,9 @@
 import { injectable } from "inversify";
 import { GameManager } from "../Game/GameManager";
 import { ClientManager } from "../Client/ClientManager";
-import { Client } from "../Client/Client";
+import { Client, INITIAL_MONEY } from "../Client/Client";
 import { boundMethod } from "autobind-decorator";
-import { MessageSender } from "../Message/MessageSender";
+import { coin, MessageSender } from "../Message/MessageSender";
 
 @injectable()
 export class ServerManager {
@@ -40,7 +40,15 @@ export class ServerManager {
     }
 
     private async informClientAboutEnd(client: Client): Promise<void> {
-        await this.messageSender.send(client, { text: "Game has ended." });
-        // TODO Check bets
+        let text = "Game has ended. ";
+        const result = client.money - INITIAL_MONEY;
+
+        if (result < 0) {
+            text += `You lost ${coin(Math.abs(result))} ¯\\_(ツ)_/¯`;
+        } else if (result > 0) {
+            text += `You won ${coin(result)} 🔥🔥🔥 FUCKING AWESOME 🔥🔥🔥`;
+        }
+
+        await this.messageSender.send(client, { text });
     }
 }
