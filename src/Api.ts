@@ -3,7 +3,14 @@ import { injectable } from "inversify";
 
 interface MeMessage {
     text: string;
-    quick_replies?: any[];
+    quick_replies?: QuickReply[];
+}
+
+interface QuickReply {
+    content_type: string,
+    title: string,
+    payload: string,
+    image_url?: string
 }
 
 @injectable()

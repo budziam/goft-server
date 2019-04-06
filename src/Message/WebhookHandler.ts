@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import { Api } from "../Api";
 import { Psid } from "./types";
+import { EventMessage, MessageHandler } from "./MessageHandler";
 
 interface WebhookEvent {
     message: EventMessage;
@@ -12,13 +12,11 @@ interface WebhookEvent {
     };
 }
 
-interface EventMessage {
-    text: string;
-}
-
 @injectable()
 export class WebhookHandler {
-    constructor(private readonly api: Api) {
+    constructor(
+        private readonly messageHandler: MessageHandler,
+    ) {
         //
     }
 
@@ -29,7 +27,7 @@ export class WebhookHandler {
             const psid = event.sender.id;
 
             if (event.message) {
-                return this.handleMessage(psid, event.message);
+                return this.messageHandler.handle(psid, event.message);
             }
 
             if (event.postback) {
@@ -50,23 +48,15 @@ export class WebhookHandler {
         }
     }
 
-    private async handleMessage(psid: Psid, message: EventMessage) {
-        if (message.text === "elo") {
-            return this.api.sendMessage(psid, { text: "No siemka ziomek" });
-        }
-
-        return this.api.sendMessage(psid, { text: "Nie wiem o co Ci chodzi" });
-    }
-
     private handlePostback(psid: string, postback: any) {
-        console.error("Not implemented yet");
+        console.warn("Postback is not implemented yet");
     }
 
     private handleReferral(psid: string, referral: any) {
-        console.error("Not implemented yet");
+        console.warn("Referral is not implemented yet");
     }
 
     private handlePassThreadControl(psid: string, pass_thread_control: any) {
-        console.error("Not implemented yet");
+        console.warn("Pass thread control is not implemented yet");
     }
 }
