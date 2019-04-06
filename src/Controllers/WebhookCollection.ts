@@ -33,6 +33,8 @@ export class WebhookCollection {
                 res.sendStatus(403);
             }
         }
+
+        res.sendStatus(422)
     }
 
     public async post(req: Request, res: Response): Promise<any> {
