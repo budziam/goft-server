@@ -69,9 +69,9 @@ export class ConnectionHandler {
 
     @boundMethod
     public close() {
-        console.info("Close connection with game!");
-
         if (this.socket !== undefined) {
+            console.info("Close connection with game!");
+
             this.socket.end();
             this.socket = undefined;
 
