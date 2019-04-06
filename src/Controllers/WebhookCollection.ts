@@ -3,14 +3,14 @@ import { Request, Response } from "express";
 import { injectable } from "inversify";
 import { EndpointNotFoundError } from "../Errors";
 import { Api } from "../Api";
-import { WebookHandler } from "../Message/WebookHandler";
+import { WebhookHandler } from "../Message/WebhookHandler";
 
 @injectable()
 @boundClass
 export class WebhookCollection {
     constructor(
         private readonly api: Api,
-        private readonly webhookHandler: WebookHandler,
+        private readonly webhookHandler: WebhookHandler,
         private readonly token: string,
     ) {
         //

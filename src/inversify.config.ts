@@ -7,6 +7,7 @@ import { ServerHttp } from "./ServerHttp";
 import { ErrorHandler } from "./ErrorHandler";
 import { WebhookCollection } from "./Controllers/WebhookCollection";
 import { Api } from "./Api";
+import { WebhookHandler } from "./Message/WebhookHandler";
 
 export const createContainer = (): Container => {
     env(`${__dirname}/../.env`);
@@ -33,7 +34,14 @@ export const createContainer = (): Container => {
 
     container
         .bind(WebhookCollection)
-        .toDynamicValue(() => new WebhookCollection(process.env.FB_VERIFY_TOKEN));
+        .toDynamicValue(
+            () =>
+                new WebhookCollection(
+                    container.get(Api),
+                    container.get(WebhookHandler),
+                    process.env.FB_VERIFY_TOKEN,
+                ),
+        );
 
     return container;
 };

@@ -17,10 +17,8 @@ interface EventMessage {
 }
 
 @injectable()
-export class WebookHandler {
-    constructor(
-        private readonly api: Api,
-    ) {
+export class WebhookHandler {
+    constructor(private readonly api: Api) {
         //
     }
 
@@ -54,10 +52,10 @@ export class WebookHandler {
 
     private async handleMessage(psid: Psid, message: EventMessage) {
         if (message.text === "elo") {
-            return this.api.sendMessage(psid, {text: "No siemka ziomek"});
+            return this.api.sendMessage(psid, { text: "No siemka ziomek" });
         }
 
-        return this.api.sendMessage(psid, {text: "Nie wiem o co Ci chodzi"});
+        return this.api.sendMessage(psid, { text: "Nie wiem o co Ci chodzi" });
     }
 
     private handlePostback(psid: string, postback: any) {
