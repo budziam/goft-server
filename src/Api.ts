@@ -1,13 +1,18 @@
 import { AxiosInstance } from "axios";
 import { injectable } from "inversify";
 
+interface MeMessage {
+    text: string;
+    quick_replies?: any[];
+}
+
 @injectable()
 export class Api {
     constructor(private readonly axios: AxiosInstance, private readonly accessToken: string) {
         //
     }
 
-    async sendMessage(psid: string, message: string): Promise<void> {
+    async sendMessage(psid: string, message: MeMessage): Promise<void> {
         const data = {
             recipient: {
                 id: psid,

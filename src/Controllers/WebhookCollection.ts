@@ -2,11 +2,17 @@ import { boundClass } from "autobind-decorator";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import { EndpointNotFoundError } from "../Errors";
+import { Api } from "../Api";
+import { WebookHandler } from "../Message/WebookHandler";
 
 @injectable()
 @boundClass
 export class WebhookCollection {
-    constructor(private readonly token: string) {
+    constructor(
+        private readonly api: Api,
+        private readonly webhookHandler: WebookHandler,
+        private readonly token: string,
+    ) {
         //
     }
 
@@ -44,12 +50,11 @@ export class WebhookCollection {
         }
 
         // Iterates over each entry - there may be multiple if batched
-        body.entry.forEach((entry: any) => {
+        for (const entry of body.entry) {
             // Gets the message. entry.messaging is an array, but
             // will only ever contain one message, so we get index 0
-            const webhook_event = entry.messaging[0];
-            console.log(webhook_event);
-        });
+            await this.webhookHandler.handle(entry.messaging[0]);
+        }
 
         // Returns a '200 OK' response to all requests
         res.status(200).send("EVENT_RECEIVED");
