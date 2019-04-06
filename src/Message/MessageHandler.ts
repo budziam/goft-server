@@ -126,11 +126,13 @@ export class MessageHandler {
 
         try {
             await this.charge(client, BULLET_COLOR_PIRCE);
-            this.gameManager.modifyColor(message.quick_reply.payload);
-            await this.sendMessage(client, { text: "The bullets look as you wish :)" });
         } catch (e) {
-            await this.handleChargeException(client, e);
+            return this.handleChargeException(client, e);
         }
+
+        this.gameManager.modifyColor(message.quick_reply.payload);
+        await this.sendMessage(client, { text: "The bullets look as you wish :)" });
+        await this.displayPossibleActions(client);
     }
 
     private async onSwitchLightsOffChosen(client: Client): Promise<void> {
@@ -138,11 +140,13 @@ export class MessageHandler {
 
         try {
             await this.charge(client, SWITCH_LIGHTS_OFF_PIRCE);
-            this.gameManager.switchOffLights();
-            await this.sendMessage(client, { text: "The lights went off. Ups..." });
         } catch (e) {
-            await this.handleChargeException(client, e);
+            return this.handleChargeException(client, e);
         }
+
+        this.gameManager.switchOffLights();
+        await this.sendMessage(client, { text: "The lights went off. Ups..." });
+        await this.displayPossibleActions(client);
     }
 
     private async onSendMessageChosen(client: Client): Promise<void> {
@@ -155,16 +159,19 @@ export class MessageHandler {
 
         try {
             await this.charge(client, MESSAGE_PIRCE);
-            this.gameManager.sendMessage(trunc(message.text));
-            await this.sendMessage(client, { text: "Your messaged was delivered to the COCKpit!" });
         } catch (e) {
-            await this.handleChargeException(client, e);
+            return this.handleChargeException(client, e);
         }
+
+        this.gameManager.sendMessage(trunc(message.text));
+        await this.sendMessage(client, { text: "Your messaged was delivered to the COCKpit!" });
+        await this.displayPossibleActions(client);
     }
 
     private async onCheckCreditsChosen(client: Client): Promise<void> {
         client.moveToState(ClientState.New);
         await this.sendMessage(client, { text: `You have ${coin(client.money)}` });
+        await this.displayPossibleActions(client);
     }
 
     private async onGameDurationMoneyChosen(client: Client, message: EventMessage): Promise<void> {
@@ -194,13 +201,15 @@ export class MessageHandler {
 
         try {
             await this.charge(client, money);
-            this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, seconds));
-            await this.sendMessage(client, {
-                text: `You bet ${coin(money)} the game will last for at least ${seconds} seconds.`,
-            });
         } catch (e) {
-            await this.handleChargeException(client, e);
+            return this.handleChargeException(client, e);
         }
+
+        this.gameManager.bet(new Bet(client.psid, BetType.GameDuration, money, seconds));
+        await this.sendMessage(client, {
+            text: `You bet ${coin(money)} the game will last for at least ${seconds} seconds. Wish you luck!`,
+        });
+        await this.displayPossibleActions(client);
     }
 
     private async displayPossibleActions(client: Client): Promise<void> {
