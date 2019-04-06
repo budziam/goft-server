@@ -37,7 +37,7 @@ const BULLET_COLOR_PIRCE = 30;
 const MESSAGE_PIRCE = 30;
 
 const coin = (value: number): string => `${value} Ƀ`;
-const trunc = (text: string, n = 32) => text.length > n ? text.substr(0, n - 1) + '...' : text;
+const trunc = (text: string, n = 32) => (text.length > n ? text.substr(0, n - 1) + "..." : text);
 
 @injectable()
 export class MessageHandler {
@@ -53,11 +53,11 @@ export class MessageHandler {
         const client = this.clientManager.get(psid);
 
         if (message.text === "elo") {
-            return this.sendMessage(client, {text: "No siemka ziomek"});
+            return this.sendMessage(client, { text: "No siemka ziomek" });
         }
 
         if (message.text === "cancel") {
-            this.sendMessage(client, {text: "Let's start from the beginning..."});
+            this.sendMessage(client, { text: "Let's start from the beginning..." });
             return this.displayPossibleActions(client);
         }
 
@@ -127,7 +127,7 @@ export class MessageHandler {
         try {
             this.charge(client, BULLET_COLOR_PIRCE);
             this.gameManager.modifyColor(message.quick_reply.payload);
-            this.sendMessage(client, {text: "The bullets look as you wish :)"});
+            this.sendMessage(client, { text: "The bullets look as you wish :)" });
         } catch (e) {
             this.handleChargeException(client, e);
         }
@@ -139,7 +139,7 @@ export class MessageHandler {
         try {
             this.charge(client, SWITCH_LIGHTS_OFF_PIRCE);
             this.gameManager.switchOffLights();
-            this.sendMessage(client, {text: "The lights went off. Ups..."});
+            this.sendMessage(client, { text: "The lights went off. Ups..." });
         } catch (e) {
             this.handleChargeException(client, e);
         }
@@ -147,7 +147,7 @@ export class MessageHandler {
 
     private onSendMessageChosen(client: Client): void {
         client.moveToState(ClientState.TypeMessage);
-        this.sendMessage(client, {text: "Type your message, no longer than 32 characters:"});
+        this.sendMessage(client, { text: "Type your message, no longer than 32 characters:" });
     }
 
     private onMessageTyped(client: Client, message: EventMessage): void {
@@ -156,14 +156,14 @@ export class MessageHandler {
         try {
             this.charge(client, MESSAGE_PIRCE);
             this.gameManager.sendMessage(trunc(message.text));
-            this.sendMessage(client, {text: "Your messaged was delivered to the COCKpit!"});
+            this.sendMessage(client, { text: "Your messaged was delivered to the COCKpit!" });
         } catch (e) {
             this.handleChargeException(client, e);
         }
     }
 
     private onCheckCreditsChosen(client: Client): void {
-        this.sendMessage(client, {text: `You have ${coin(client.money)}`});
+        this.sendMessage(client, { text: `You have ${coin(client.money)}` });
     }
 
     private onGameDurationMoneyChosen(client: Client, message: EventMessage): void {
@@ -204,9 +204,16 @@ export class MessageHandler {
 
     private displayPossibleActions(client: Client): void {
         client.moveToState(ClientState.ActionDecision);
-        this.sendMessage(client, {text: "You can always type `cancel` to start from the beginning"});
         this.sendMessage(client, {
-            text: "What do you want to do?",
+            text: "You can always type `cancel` to start from the beginning",
+        });
+        this.sendMessage(client, {
+            text: `What do you want to do?\n
+            \n
+            Pricing:\n
+            - Modify bullet color ${coin(BULLET_COLOR_PIRCE)}\n
+            - Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}\n
+            - Send message ${coin(MESSAGE_PIRCE)}`,
             quick_replies: [
                 {
                     content_type: "text",
@@ -215,17 +222,17 @@ export class MessageHandler {
                 },
                 {
                     content_type: "text",
-                    title: `${coin(BULLET_COLOR_PIRCE)} Modify bullet color`,
+                    title: "Modify bullet color",
                     payload: ActionPayload.BulletColor,
                 },
                 {
                     content_type: "text",
-                    title: `${coin(SWITCH_LIGHTS_OFF_PIRCE)} Switch lights off`,
+                    title: "Switch lights off",
                     payload: ActionPayload.SwitchLightsOff,
                 },
                 {
                     content_type: "text",
-                    title: `${coin(MESSAGE_PIRCE)} Send message`,
+                    title: "Send message",
                     payload: ActionPayload.SendMessage,
                 },
                 {
@@ -312,7 +319,7 @@ export class MessageHandler {
 
     private charge(client: Client, money: number): void {
         client.charge(money);
-        this.sendMessage(client, {text: `You were charged ${coin(money)}`});
+        this.sendMessage(client, { text: `You were charged ${coin(money)}` });
     }
 
     private sendMessage(client: Client, message: MeMessage): void {
