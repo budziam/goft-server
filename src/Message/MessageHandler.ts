@@ -318,9 +318,10 @@ What do you want to do?`,
 
     private async handleChargeException(client: Client, e: any): Promise<void> {
         if (e instanceof NotEnoughMoneyError) {
-            return this.sendMessage(client, {
+            await this.sendMessage(client, {
                 text: `Your credits ${coin(client.money)} are not enough ¯\\_(ツ)_/¯`,
             });
+            return this.displayPossibleActions(client);
         }
 
         throw e;
