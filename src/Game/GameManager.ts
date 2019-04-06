@@ -14,12 +14,17 @@ export class GameManager {
 
     public bet(bet: Bet): void {
         this.bets.push(bet);
-        console.info(`New bet! [${bet}]`);
+        console.info("New bet!", { bet });
         // TODO Send info to game
     }
 
     public clear(): void {
         this.bets = [];
         this.bulletColor = undefined;
+    }
+
+    public switchOffLights(): void {
+        // TODO Send info to game
+        console.info("Switch off the lights!");
     }
 }

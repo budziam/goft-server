@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import { injectable } from "inversify";
 
-interface MeMessage {
+export interface MeMessage {
     text: string;
     quick_replies?: QuickReply[];
 }
