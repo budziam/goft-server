@@ -120,6 +120,7 @@ export class MessageHandler {
     }
 
     private async unknownSituation(client: Client): Promise<void> {
+        client.moveToState(ClientState.New);
         return this.api.sendMessage(client.psid, { text: "I've got trouble with understanding you. Let's start from the beginning..." });
     }
 }
