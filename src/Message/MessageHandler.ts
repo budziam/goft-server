@@ -163,6 +163,7 @@ export class MessageHandler {
     }
 
     private async onCheckCreditsChosen(client: Client): Promise<void> {
+        client.moveToState(ClientState.New);
         await this.sendMessage(client, { text: `You have ${coin(client.money)}` });
     }
 
