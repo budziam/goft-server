@@ -215,15 +215,14 @@ export class MessageHandler {
     private async displayPossibleActions(client: Client): Promise<void> {
         client.moveToState(ClientState.ActionDecision);
         await this.sendMessage(client, {
-            text: "You can always type `cancel` to start from the beginning",
-        });
-        await this.sendMessage(client, {
-            text: `What do you want to do?
-            
+            text: `Hint: you can always type \`cancel\` to start from the beginning
+
 Pricing:
 - Modify bullet color ${coin(BULLET_COLOR_PIRCE)}
 - Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
-- Send message ${coin(MESSAGE_PIRCE)}`,
+- Send message ${coin(MESSAGE_PIRCE)}
+
+What do you want to do?`,
             quick_replies: [
                 {
                     content_type: "text",
