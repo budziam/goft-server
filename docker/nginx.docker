@@ -1,5 +1,5 @@
 FROM nginx:1.10
 
 ADD ./docker/vhost.conf /etc/nginx/conf.d/default.conf
-ADD ./docker/privacy.html /var/www/privacy.html
+COPY ./docker/files /var/www/page
 WORKDIR /var/www

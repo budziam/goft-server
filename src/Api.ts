@@ -7,10 +7,10 @@ interface MeMessage {
 }
 
 interface QuickReply {
-    content_type: string,
-    title: string,
-    payload: string,
-    image_url?: string
+    content_type: string;
+    title: string;
+    payload: string;
+    image_url?: string;
 }
 
 @injectable()

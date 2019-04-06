@@ -2,8 +2,8 @@ import { Psid } from "../Message/types";
 
 export enum ClientState {
     New = 1,
-    ChoosingGame,
     ActionDecision,
+    ChooseBulletColor,
 }
 
 export class Client {

@@ -12,7 +12,10 @@ import { WebhookHandler } from "./Message/WebhookHandler";
 export const createContainer = (): Container => {
     env(`${__dirname}/../.env`);
 
-    const container = new Container({ autoBindInjectable: true });
+    const container = new Container({
+        autoBindInjectable: true,
+        defaultScope: "Singleton",
+    });
 
     container.bind(Container).toConstantValue(container);
 

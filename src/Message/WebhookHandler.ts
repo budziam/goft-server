@@ -14,9 +14,7 @@ interface WebhookEvent {
 
 @injectable()
 export class WebhookHandler {
-    constructor(
-        private readonly messageHandler: MessageHandler,
-    ) {
+    constructor(private readonly messageHandler: MessageHandler) {
         //
     }
 
