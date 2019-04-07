@@ -20,7 +20,7 @@ export const INITIAL_MONEY = 100;
 
 export class Client {
     private readonly _psid: Psid;
-    private _state: ClientState = ClientState.New;
+    private _state: ClientState = ClientState.ActionDecision;
     private _money: number = INITIAL_MONEY;
     private _profile?: ClientProfile;
 
