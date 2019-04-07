@@ -174,7 +174,7 @@ export class MessageHandler {
 
         this.gameManager.sendMessage(trunc(message.text), client);
         await this.messageSender.send(client, {
-            text: "Your messaged was delivered to the COCKpit 👨‍❤️‍👨 !",
+            text: "Your messaged has been delivered to the COCKpit.",
         });
         await this.messageSender.displayPossibleActions(client);
     }
