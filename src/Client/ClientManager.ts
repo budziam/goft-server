@@ -19,6 +19,8 @@ export class ClientManager {
     }
 
     public clear(): void {
-        this._clients.clear();
+        for (const client of this._clients.values()) {
+            client.reset();
+        }
     }
 }

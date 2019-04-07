@@ -51,6 +51,11 @@ export class Client {
         this._profile = profile;
     }
 
+    public reset() {
+        this._money = INITIAL_MONEY;
+        this._state = ClientState.ActionDecision;
+    }
+
     public moveToState(newState: ClientState): void {
         this._state = newState;
     }
