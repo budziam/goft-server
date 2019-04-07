@@ -8,6 +8,7 @@ import { ErrorHandler } from "./ErrorHandler";
 import { WebhookCollection } from "./Controllers/WebhookCollection";
 import { Api } from "./Api";
 import { WebhookHandler } from "./Message/WebhookHandler";
+import { ImageTool } from "./ImageTool";
 
 export const createContainer = (): Container => {
     env(`${__dirname}/../.env`);
@@ -32,7 +33,14 @@ export const createContainer = (): Container => {
 
     container
         .bind(Api)
-        .toDynamicValue(() => new Api(axios, process.env.FB_ACCESS_TOKEN))
+        .toDynamicValue(
+            () => new Api(axios, container.get<ImageTool>(ImageTool), process.env.FB_ACCESS_TOKEN),
+        )
+        .inSingletonScope();
+
+    container
+        .bind(ImageTool)
+        .toDynamicValue(() => new ImageTool(axios))
         .inSingletonScope();
 
     container

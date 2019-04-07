@@ -36,6 +36,10 @@ export class ServerManager {
     public endGame(): void {
         for (const client of this.clientManager.clients) {
             this.informClientAboutEnd(client).catch(console.error);
+
+            if (!client.isActive) {
+                this.clientManager.remove(client.psid);
+            }
         }
 
         this.clientManager.clear();

@@ -24,6 +24,7 @@ export class Client {
     private _state: ClientState = ClientState.ActionDecision;
     private _money: number = INITIAL_MONEY;
     private _profile?: ClientProfile;
+    public isActive: boolean = false;
 
     public tmpMoney?: string;
 
@@ -55,6 +56,7 @@ export class Client {
     public reset() {
         this._money = INITIAL_MONEY;
         this._state = ClientState.ActionDecision;
+        this.isActive = false;
     }
 
     public moveToState(newState: ClientState): void {
@@ -62,6 +64,8 @@ export class Client {
     }
 
     public charge(money: number): void {
+        this.isActive = true;
+
         if (this._money < money) {
             throw new NotEnoughMoneyError();
         }

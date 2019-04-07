@@ -18,6 +18,10 @@ export class ClientManager {
         return this._clients.get(psid);
     }
 
+    public remove(psid: Psid): void {
+        this._clients.delete(psid);
+    }
+
     public clear(): void {
         for (const client of this._clients.values()) {
             client.reset();

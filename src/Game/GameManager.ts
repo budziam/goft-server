@@ -24,7 +24,7 @@ export class GameManager {
         this.connectionHandler.send(
             {
                 type: MessageType.ChangeBulletColor,
-                data: {color},
+                data: { color },
             },
             client,
         );
@@ -50,7 +50,7 @@ export class GameManager {
         }, bet.duration * 1000) as any;
         this.timeoutHandles.add(handler);
 
-        console.info("New bet!", {bet});
+        console.info("New bet!", { bet });
     }
 
     public switchOffLights(client: Client): void {
@@ -67,7 +67,7 @@ export class GameManager {
         this.connectionHandler.send(
             {
                 type: MessageType.SendMessage,
-                data: {text},
+                data: { text },
             },
             client,
         );
@@ -78,7 +78,7 @@ export class GameManager {
         this.connectionHandler.send(
             {
                 type: MessageType.SendMeme,
-                data: {image},
+                data: { image },
             },
             client,
         );

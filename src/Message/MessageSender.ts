@@ -3,8 +3,10 @@ import { Client, ClientState } from "../Client/Client";
 import { Api, MeMessage } from "../Api";
 import {
     ActionPayload,
-    BULLET_COLOR_PIRCE, SEND_MEME_PIRCE,
-    SEND_MESSAGE_PIRCE, SPAWN_ENEMIES_PRICE,
+    BULLET_COLOR_PIRCE,
+    SEND_MEME_PIRCE,
+    SEND_MESSAGE_PIRCE,
+    SPAWN_ENEMIES_PRICE,
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 

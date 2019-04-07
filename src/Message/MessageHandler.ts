@@ -8,12 +8,15 @@ import { NotEnoughMoneyError } from "../Errors/NotEnoughMoneyError";
 import { ConnectionHandler } from "../Server/ConnectionHandler";
 import {
     ActionPayload,
-    BULLET_COLOR_PIRCE, SEND_MEME_PIRCE,
-    SEND_MESSAGE_PIRCE, SPAWN_ENEMIES_PRICE,
+    BULLET_COLOR_PIRCE,
+    SEND_MEME_PIRCE,
+    SEND_MESSAGE_PIRCE,
+    SPAWN_ENEMIES_PRICE,
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 import { coin, MessageSender } from "./MessageSender";
 import { Api } from "../Api";
+import { ImageTool } from "../ImageTool";
 
 interface MessageQuickReply {
     payload: string;
@@ -33,6 +36,7 @@ const equals = (a: string, b: string): boolean => a.toLowerCase().trim() === b.t
 export class MessageHandler {
     constructor(
         private readonly api: Api,
+        private readonly imageTool: ImageTool,
         private readonly clientManager: ClientManager,
         private readonly connectionHandler: ConnectionHandler,
         private readonly gameManager: GameManager,
@@ -219,6 +223,13 @@ export class MessageHandler {
     }
 
     private async onMemeTyped(client: Client, message: EventMessage): Promise<void> {
+        let image: string;
+        try {
+            image = await this.imageTool.meme(message.text);
+        } catch (e) {
+            return this.unknownSituation(client);
+        }
+
         client.moveToState(ClientState.ActionDecision);
 
         try {
@@ -227,8 +238,7 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        // TODO Get image and resize it
-        this.gameManager.sendMeme(message.text, client);
+        this.gameManager.sendMeme(image, client);
         await this.messageSender.send(client, {
             text: "Your meme has been delivered to the COCKpit.",
         });

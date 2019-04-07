@@ -2,8 +2,7 @@ import { AxiosInstance } from "axios";
 import { injectable } from "inversify";
 import { Psid } from "./Message/types";
 import { ClientProfile } from "./Client/Client";
-import * as sharp from "sharp";
-import { Stream } from "stream";
+import { ImageTool } from "./ImageTool";
 
 export interface MeMessage {
     text: string;
@@ -19,7 +18,11 @@ interface QuickReply {
 
 @injectable()
 export class Api {
-    constructor(private readonly axios: AxiosInstance, private readonly accessToken: string) {
+    constructor(
+        private readonly axios: AxiosInstance,
+        private readonly imageTool: ImageTool,
+        private readonly accessToken: string,
+    ) {
         //
     }
 
@@ -46,13 +49,9 @@ export class Api {
         );
 
         let avatar = "";
-
         if (response.data.profile_pic) {
             try {
-                const picResponse = await this.axios.get(response.data.profile_pic, {
-                    responseType: "stream",
-                });
-                avatar = await this.transformImage(picResponse.data);
+                avatar = await this.imageTool.avatar(response.data.profile_pic);
             } catch (e) {
                 console.error(e);
             }
@@ -63,25 +62,5 @@ export class Api {
             lastName: response.data.last_name,
             avatar,
         };
-    }
-
-    private async transformImage(data: Stream): Promise<string> {
-        const roundedCorners = Buffer.from(
-            '<svg><rect x="0" y="0" width="32" height="32" rx="50" ry="50"/></svg>',
-        );
-
-        const roundedCornerResizer = sharp()
-            .resize(32, 32)
-            .composite([
-                {
-                    input: roundedCorners,
-                    blend: "dest-in",
-                },
-            ])
-            .png();
-
-        const buffer = await data.pipe(roundedCornerResizer).toBuffer();
-
-        return buffer.toString("base64");
     }
 }
