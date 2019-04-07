@@ -8,7 +8,7 @@ import {
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 
-export const coin = (value: number): string => `💰${value}`;
+export const coin = (value: number): string => `${value}💰`;
 
 @injectable()
 export class MessageSender {
