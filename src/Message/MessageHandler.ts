@@ -48,10 +48,11 @@ export class MessageHandler {
 
     public async handle(psid: Psid, message: EventMessage): Promise<void> {
         const client = this.clientManager.get(psid);
-        message.text = message.text.toLowerCase().trim();
+        message.text = message.text.trim();
+        const text = message.text.toLowerCase();
 
-        // TODO Do not trim if sending message
         // TODO Handle messages properly even if not clicked by button
+        // TODO Change handling elo
 
         if (!client.profile) {
             this.api
@@ -60,7 +61,7 @@ export class MessageHandler {
                 .catch(console.error);
         }
 
-        if (message.text === "elo") {
+        if (text === "elo") {
             return this.messageSender.send(client, { text: "No siemka ziomek" });
         }
 
@@ -70,7 +71,7 @@ export class MessageHandler {
             });
         }
 
-        if (message.text === "cancel") {
+        if (text === "cancel") {
             await this.messageSender.send(client, { text: "Let's start from the beginning..." });
             return this.messageSender.displayPossibleActions(client);
         }
