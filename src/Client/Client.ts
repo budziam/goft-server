@@ -3,8 +3,7 @@ import { NotEnoughMoneyError } from "../Errors/NotEnoughMoneyError";
 import { boundMethod } from "autobind-decorator";
 
 export enum ClientState {
-    New = 1,
-    ActionDecision,
+    ActionDecision = 1,
     ChooseBulletColor,
     ChooseGameDurationMoney,
     ChooseGameDuration,

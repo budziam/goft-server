@@ -34,22 +34,22 @@ You have ${coin(client.money)} What do you want to do?`,
             quick_replies: [
                 {
                     content_type: "text",
-                    title: "Bet game duration",
+                    title: ActionPayload.BetGameDuration,
                     payload: ActionPayload.BetGameDuration,
                 },
                 {
                     content_type: "text",
-                    title: "Modify bullet color",
+                    title: ActionPayload.BulletColor,
                     payload: ActionPayload.BulletColor,
                 },
                 {
                     content_type: "text",
-                    title: "Switch lights off",
+                    title: ActionPayload.SwitchLightsOff,
                     payload: ActionPayload.SwitchLightsOff,
                 },
                 {
                     content_type: "text",
-                    title: "Send message",
+                    title: ActionPayload.SendMessage,
                     payload: ActionPayload.SendMessage,
                 },
             ],

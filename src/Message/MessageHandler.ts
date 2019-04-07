@@ -24,12 +24,6 @@ export interface EventMessage {
     quick_reply?: MessageQuickReply;
 }
 
-enum BulletColorPayload {
-    Red = "#FF0000",
-    Green = "#00FF00",
-    Blue = "#0000FF",
-}
-
 const ALL_IN = "all-in";
 
 const trunc = (text: string, n = 27) => (text.length > n ? text.substr(0, n - 1) + "..." : text);
@@ -51,9 +45,6 @@ export class MessageHandler {
         message.text = message.text.trim();
         const text = message.text.toLowerCase();
 
-        // TODO Handle messages properly even if not clicked by button
-        // TODO Change handling elo
-
         if (!client.profile) {
             this.api
                 .getProfile(client.psid)
@@ -61,7 +52,7 @@ export class MessageHandler {
                 .catch(console.error);
         }
 
-        if (text === "elo") {
+        if (client.state === ClientState.ActionDecision && text === "elo") {
             return this.messageSender.send(client, { text: "No siemka ziomek" });
         }
 
@@ -73,10 +64,6 @@ export class MessageHandler {
 
         if (text === "cancel") {
             await this.messageSender.send(client, { text: "Let's start from the beginning..." });
-            return this.messageSender.displayPossibleActions(client);
-        }
-
-        if (client.state === ClientState.New) {
             return this.messageSender.displayPossibleActions(client);
         }
 
@@ -104,40 +91,46 @@ export class MessageHandler {
     }
 
     private async onActionChosen(client: Client, message: EventMessage): Promise<void> {
-        if (!message.quick_reply) {
-            return this.unknownSituation(client);
-        }
+        const text = message.quick_reply ? message.quick_reply.payload : message.text;
+        const action = text.toLowerCase();
 
-        if (message.quick_reply.payload === ActionPayload.BulletColor) {
+        if (action === ActionPayload.BulletColor) {
             return this.displayPossibleBulletColors(client);
         }
 
-        if (message.quick_reply.payload === ActionPayload.SwitchLightsOff) {
+        if (action === ActionPayload.SwitchLightsOff) {
             return this.onSwitchLightsOffChosen(client);
         }
 
-        if (message.quick_reply.payload === ActionPayload.SendMessage) {
+        if (action === ActionPayload.SendMessage) {
             return this.onSendMessageChosen(client);
         }
 
-        if (message.quick_reply.payload === ActionPayload.BetGameDuration) {
+        if (action === ActionPayload.BetGameDuration) {
             client.moveToState(ClientState.ChooseGameDurationMoney);
             return this.displayPossibleBetRates(client);
         }
 
-        return this.unknownSituation(client);
+        return this.messageSender.displayPossibleActions(client);
     }
 
     private async onBulletColorChosen(client: Client, message: EventMessage): Promise<void> {
         const text = message.quick_reply ? message.quick_reply.payload : message.text;
+        let color = text.toLowerCase().replace(/^#?/, "#");
 
-        if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(text)) {
+        if (color === "red") {
+            color = "#FF0000";
+        } else if (color === "green") {
+            color = "#00FF00";
+        } else if (color === "blue") {
+            color = "#0000FF";
+        }
+
+        if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(color)) {
             return this.unknownSituation(client);
         }
 
-        const color = text.replace(/^#?/, "#");
-
-        client.moveToState(ClientState.New);
+        client.moveToState(ClientState.ActionDecision);
 
         try {
             await this.charge(client, BULLET_COLOR_PIRCE);
@@ -151,7 +144,7 @@ export class MessageHandler {
     }
 
     private async onSwitchLightsOffChosen(client: Client): Promise<void> {
-        client.moveToState(ClientState.New);
+        client.moveToState(ClientState.ActionDecision);
 
         try {
             await this.charge(client, SWITCH_LIGHTS_OFF_PIRCE);
@@ -172,7 +165,7 @@ export class MessageHandler {
     }
 
     private async onMessageTyped(client: Client, message: EventMessage): Promise<void> {
-        client.moveToState(ClientState.New);
+        client.moveToState(ClientState.ActionDecision);
 
         try {
             await this.charge(client, MESSAGE_PIRCE);
@@ -239,7 +232,7 @@ export class MessageHandler {
             return this.unknownSituation(client);
         }
 
-        client.moveToState(ClientState.New);
+        client.moveToState(ClientState.ActionDecision);
 
         const duration = Math.min(parsedDuration, 1000);
         const money = tmpMoney === ALL_IN ? client.money : parseInt(tmpMoney);
@@ -267,19 +260,19 @@ export class MessageHandler {
                 {
                     content_type: "text",
                     title: "Red",
-                    payload: BulletColorPayload.Red,
+                    payload: "Red",
                     image_url: "https://gotf.sklep-sms.pl/images/red.png",
                 },
                 {
                     content_type: "text",
                     title: "Green",
-                    payload: BulletColorPayload.Green,
+                    payload: "Green",
                     image_url: "https://gotf.sklep-sms.pl/images/green.png",
                 },
                 {
                     content_type: "text",
                     title: "Blue",
-                    payload: BulletColorPayload.Blue,
+                    payload: "Blue",
                     image_url: "https://gotf.sklep-sms.pl/images/blue.png",
                 },
             ],
@@ -315,7 +308,7 @@ export class MessageHandler {
     }
 
     private async unknownSituation(client: Client): Promise<void> {
-        client.moveToState(ClientState.New);
+        client.moveToState(ClientState.ActionDecision);
         await this.messageSender.send(client, {
             text: "I've got trouble with understanding you. Let's start from the beginning...",
         });
