@@ -17,7 +17,7 @@ export interface ClientProfile {
     avatar: string;
 }
 
-export const INITIAL_MONEY = 100;
+export const INITIAL_MONEY = 300;
 
 export class Client {
     private readonly _psid: Psid;
