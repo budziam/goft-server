@@ -14,19 +14,30 @@ export class ServerManager {
         private readonly messageSender: MessageSender,
         private readonly connectionHandler: ConnectionHandler,
     ) {
+        //
+    }
+
+    public init(): void {
         this.connectionHandler.onStart = this.startGame;
         this.connectionHandler.onClose = this.endGame;
     }
 
     @boundMethod
     public startGame(): void {
+        console.log("ServerManager: startGame");
+
         for (const client of this.clientManager.clients) {
             this.informClientAboutStart(client).catch(console.error);
         }
+
+        this.clientManager.clear();
+        this.gameManager.clear();
     }
 
     @boundMethod
     public endGame(): void {
+        console.log("ServerManager: endGame");
+
         for (const client of this.clientManager.clients) {
             this.informClientAboutEnd(client).catch(console.error);
         }

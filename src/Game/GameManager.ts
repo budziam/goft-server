@@ -8,8 +8,8 @@ const SECONDS_TO_DOUBLE = 20;
 
 @injectable()
 export class GameManager {
-    private bulletColor: string;
     public bets: Bet[] = [];
+    private bulletColor: string;
     private timeoutHandles: Set<number> = new Set();
 
     constructor(

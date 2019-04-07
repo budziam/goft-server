@@ -3,6 +3,7 @@ import { Server, Socket } from "net";
 import * as net from "net";
 import { ConnectionHandler } from "./ConnectionHandler";
 import { boundMethod } from "autobind-decorator";
+import { ServerManager } from "./ServerManager";
 
 @injectable()
 export class ServerTCP {
@@ -10,6 +11,7 @@ export class ServerTCP {
 
     constructor(
         private readonly connectionHandler: ConnectionHandler,
+        private readonly serverManager: ServerManager,
         private readonly address = "0.0.0.0",
         private readonly port = 3000,
     ) {
@@ -35,5 +37,6 @@ export class ServerTCP {
     @boundMethod
     private onConnection(socket: Socket): void {
         this.connectionHandler.start(socket);
+        this.serverManager.init();
     }
 }

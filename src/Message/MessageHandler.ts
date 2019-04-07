@@ -179,7 +179,7 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        this.gameManager.sendMessage(trunc(message.text));
+        this.gameManager.sendMessage(trunc(message.text), client);
         await this.messageSender.send(client, {
             text: "Your messaged was delivered to the COCKpit!",
         });

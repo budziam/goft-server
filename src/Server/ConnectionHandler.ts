@@ -42,7 +42,7 @@ export class ConnectionHandler {
 
         this.send({ type: MessageType.Handshake });
 
-        if (this.onStart) {
+        if (this.onStart !== undefined) {
             this.onStart();
         }
 
@@ -82,7 +82,7 @@ export class ConnectionHandler {
             this.socket.end();
             this.socket = undefined;
 
-            if (this.onClose) {
+            if (this.onClose !== undefined) {
                 this.onClose();
             }
         }
