@@ -126,7 +126,7 @@ export class MessageHandler {
             return this.displayPossibleBetRates(client);
         }
 
-        return this.unknownSituation(client);
+        return this.messageSender.displayPossibleActions(client);
     }
 
     private async onBulletColorChosen(client: Client, message: EventMessage): Promise<void> {

@@ -25,7 +25,7 @@ export class MessageSender {
     public async askForNextAction(client: Client): Promise<void> {
         client.moveToState(ClientState.ActionDecision);
         await this.send(client, {
-            text: `You have ${coin(client.money)} What do you want to do?`,
+            text: `You have ${coin(client.money)}. What do you want to do?`,
             quick_replies: this.getQuickReplies(),
         });
     }
@@ -42,7 +42,7 @@ Pricing
 - 📩 Send message ${coin(SEND_MESSAGE_PIRCE)}
 - 💌 Send meme ${coin(SEND_MEME_PIRCE)}
 
-You have ${coin(client.money)} What do you want to do?`,
+You have ${coin(client.money)}. What do you want to do?`,
             quick_replies: this.getQuickReplies(),
         });
     }
