@@ -51,7 +51,7 @@ You have ${coin(client.money)} What do you want to do?`,
                     content_type: "text",
                     title: "Send message",
                     payload: ActionPayload.SendMessage,
-                }
+                },
             ],
         });
     }

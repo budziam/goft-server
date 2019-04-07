@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { Bet } from "./Bet";
 import { ConnectionHandler, MessageType } from "../Server/ConnectionHandler";
 import { coin, MessageSender } from "../Message/MessageSender";
+import { Client } from "../Client/Client";
 
 const SECONDS_TO_DOUBLE = 20;
 
@@ -18,24 +19,30 @@ export class GameManager {
         //
     }
 
-    public modifyColor(color: string): void {
+    public modifyColor(color: string, client: Client): void {
         this.bulletColor = color;
-        this.connectionHandler.send({
-            type: MessageType.ChangeBulletColor,
-            data: { color },
-        });
+        this.connectionHandler.send(
+            {
+                type: MessageType.ChangeBulletColor,
+                data: { color },
+            },
+            client,
+        );
         console.info(`Color of bullets has changed to [${this.bulletColor}]`);
     }
 
     public bet(bet: Bet): void {
         this.bets.push(bet);
-        this.connectionHandler.send({
-            type: MessageType.BetGameDuration,
-            data: {
-                money: bet.money,
-                duration: bet.duration,
+        this.connectionHandler.send(
+            {
+                type: MessageType.BetGameDuration,
+                data: {
+                    money: bet.money,
+                    duration: bet.duration,
+                },
             },
-        });
+            bet.client,
+        );
 
         const handler = setTimeout(() => {
             this.timeoutHandles.delete(handler);
@@ -46,18 +53,24 @@ export class GameManager {
         console.info("New bet!", { bet });
     }
 
-    public switchOffLights(): void {
-        this.connectionHandler.send({
-            type: MessageType.SwitchLightOff,
-        });
+    public switchOffLights(client: Client): void {
+        this.connectionHandler.send(
+            {
+                type: MessageType.SwitchLightOff,
+            },
+            client,
+        );
         console.info("Switch off the lights!");
     }
 
-    public sendMessage(text: string) {
-        this.connectionHandler.send({
-            type: MessageType.SendMessage,
-            data: { text },
-        });
+    public sendMessage(text: string, client: Client) {
+        this.connectionHandler.send(
+            {
+                type: MessageType.SendMessage,
+                data: { text },
+            },
+            client,
+        );
         console.info(`Someone send message [${text}]!`);
     }
 

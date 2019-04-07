@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { Socket } from "net";
 import { prependLength, splitData } from "./utils";
 import { boundMethod } from "autobind-decorator";
+import { Client, ClientProfile } from "../Client/Client";
 
 export enum MessageType {
     Handshake = "handshake",
@@ -14,6 +15,7 @@ export enum MessageType {
 interface TcpMessage {
     type: MessageType;
     data?: any;
+    client?: ClientProfile;
 }
 
 @injectable()
@@ -31,7 +33,6 @@ export class ConnectionHandler {
         this.socket = socket;
 
         this.socket
-        // @ts-ignore
             .on("data", data => splitData(data, this.handleMessage))
             .on("close", this.close)
             .on("error", error => {
@@ -39,7 +40,7 @@ export class ConnectionHandler {
                 this.close();
             });
 
-        this.send({type: MessageType.Handshake});
+        this.send({ type: MessageType.Handshake });
 
         if (this.onStart) {
             this.onStart();
@@ -48,7 +49,13 @@ export class ConnectionHandler {
         console.info("New connection from game!");
     }
 
-    public send(message: TcpMessage): void {
+    public send(message: TcpMessage, client?: Client): void {
+        const data: TcpMessage = { ...message };
+
+        if (client) {
+            data.client = { ...client.profile };
+        }
+
         if (!this.isLive()) {
             console.warn("Game is not started. Cannot send message.");
             return;
@@ -61,7 +68,7 @@ export class ConnectionHandler {
     private handleMessage(message: string): void {
         try {
             const data = JSON.parse(message);
-            console.info("Received data", {data});
+            console.info("Received data", { data });
         } catch (e) {
             console.warn(`Invalid message [${message}]`);
         }

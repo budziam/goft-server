@@ -1,8 +1,6 @@
 import { Psid } from "../Message/types";
 import { NotEnoughMoneyError } from "../Errors/NotEnoughMoneyError";
 
-// https://stackoverflow.com/questions/37518264/how-to-access-the-name-of-someone-with-messenger-chat-bot-facebook-messenger-s
-
 export enum ClientState {
     New = 1,
     ActionDecision,
@@ -12,12 +10,19 @@ export enum ClientState {
     TypeMessage,
 }
 
+export interface ClientProfile {
+    firstName: string;
+    lastName: string;
+    avatar: string;
+}
+
 export const INITIAL_MONEY = 100;
 
 export class Client {
     private readonly _psid: Psid;
     private _state: ClientState = ClientState.New;
     private _money: number = INITIAL_MONEY;
+    private _profile?: ClientProfile;
 
     public tmpMoney?: string;
 
@@ -35,6 +40,14 @@ export class Client {
 
     public get money(): number {
         return this._money;
+    }
+
+    public get profile(): ClientProfile {
+        return this._profile;
+    }
+
+    public setProfile(profile: ClientProfile): void {
+        this._profile = profile;
     }
 
     public moveToState(newState: ClientState): void {

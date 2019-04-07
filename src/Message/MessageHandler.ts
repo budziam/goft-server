@@ -13,6 +13,7 @@ import {
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 import { coin, MessageSender } from "./MessageSender";
+import { Api } from "../Api";
 
 interface MessageQuickReply {
     payload: string;
@@ -36,6 +37,7 @@ const trunc = (text: string, n = 32) => (text.length > n ? text.substr(0, n - 1)
 @injectable()
 export class MessageHandler {
     constructor(
+        private readonly api: Api,
         private readonly clientManager: ClientManager,
         private readonly connectionHandler: ConnectionHandler,
         private readonly gameManager: GameManager,
@@ -47,6 +49,16 @@ export class MessageHandler {
     public async handle(psid: Psid, message: EventMessage): Promise<void> {
         const client = this.clientManager.get(psid);
         message.text = message.text.toLowerCase().trim();
+
+        // TODO Do not trim if sending message
+        // TODO Handle messages properly even if not clicked by button
+
+        if (!client.profile) {
+            this.api
+                .getProfile(client.psid)
+                .then(client.setProfile)
+                .catch(console.error);
+        }
 
         if (message.text === "elo") {
             return this.messageSender.send(client, { text: "No siemka ziomek" });
@@ -132,7 +144,7 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        this.gameManager.modifyColor(color);
+        this.gameManager.modifyColor(color, client);
         await this.messageSender.send(client, { text: "The bullets look as you wish :)" });
         await this.messageSender.displayPossibleActions(client);
     }
@@ -146,7 +158,7 @@ export class MessageHandler {
             return this.handleChargeException(client, e);
         }
 
-        this.gameManager.switchOffLights();
+        this.gameManager.switchOffLights(client);
         await this.messageSender.send(client, { text: "The lights went off. Ups..." });
         await this.messageSender.displayPossibleActions(client);
     }
@@ -211,7 +223,7 @@ export class MessageHandler {
                     title: "60",
                     payload: "60",
                 },
-            ]
+            ],
         });
     }
 

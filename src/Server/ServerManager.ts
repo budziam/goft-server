@@ -52,6 +52,6 @@ export class ServerManager {
             text += `You won ${coin(result)} 🔥🔥🔥 FUCKING AWESOME 🔥🔥🔥`;
         }
 
-        await this.messageSender.send(client, {text});
+        await this.messageSender.send(client, { text });
     }
 }
