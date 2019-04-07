@@ -23,7 +23,7 @@ export class MessageSender {
     public async displayPossibleActions(client: Client): Promise<void> {
         client.moveToState(ClientState.ActionDecision);
         await this.send(client, {
-            text: `Hint: you can always type \`cancel\` to start from the beginning
+            text: `Hint: you can always type \`cancel\` to start from the beginning.
 
 Pricing
 - 🔫 Bullets color ${coin(BULLET_COLOR_PIRCE)}
