@@ -138,7 +138,7 @@ export class MessageHandler {
         }
 
         this.gameManager.modifyColor(color, client);
-        await this.messageSender.send(client, { text: "The bullets look as you wish :)" });
+        await this.messageSender.send(client, { text: "The bullets look as you wish 🤪" });
         await this.messageSender.displayPossibleActions(client);
     }
 
@@ -152,7 +152,7 @@ export class MessageHandler {
         }
 
         this.gameManager.switchOffLights(client);
-        await this.messageSender.send(client, { text: "The lights went off. Ups..." });
+        await this.messageSender.send(client, { text: "The lights went off. Ups... 😎😎😎" });
         await this.messageSender.displayPossibleActions(client);
     }
 
@@ -174,7 +174,7 @@ export class MessageHandler {
 
         this.gameManager.sendMessage(trunc(message.text), client);
         await this.messageSender.send(client, {
-            text: "Your messaged was delivered to the COCKpit!",
+            text: "Your messaged was delivered to the COCKpit 👨‍❤️‍👨 !",
         });
         await this.messageSender.displayPossibleActions(client);
     }
@@ -189,7 +189,7 @@ export class MessageHandler {
         client.tmpMoney = money;
         client.moveToState(ClientState.ChooseGameDuration);
         await this.messageSender.send(client, {
-            text: "Tell me, in seconds, how long the game will last at least?",
+            text: "Tell me, in seconds ⏱, how long the game will last at least?",
             quick_replies: [
                 {
                     content_type: "text",
@@ -246,7 +246,7 @@ export class MessageHandler {
         await this.messageSender.send(client, {
             text: `You bet ${coin(
                 money,
-            )} the game will last for at least ${duration} seconds. Wish you luck!`,
+            )} the game will last for at least ${duration} seconds. Wish you luck! 🙏🙏`,
         });
         await this.messageSender.displayPossibleActions(client);
     }
@@ -309,7 +309,7 @@ export class MessageHandler {
     private async unknownSituation(client: Client): Promise<void> {
         client.moveToState(ClientState.ActionDecision);
         await this.messageSender.send(client, {
-            text: "I've got trouble with understanding you. Let's start from the beginning...",
+            text: "I've got trouble with understanding you 🧐. Let's start from the beginning...",
         });
         await this.messageSender.displayPossibleActions(client);
     }

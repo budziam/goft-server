@@ -8,7 +8,7 @@ import {
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 
-export const coin = (value: number): string => `Ƀ ${value}`;
+export const coin = (value: number): string => `💰 ${value}`;
 
 @injectable()
 export class MessageSender {
@@ -25,10 +25,10 @@ export class MessageSender {
         await this.send(client, {
             text: `Hint: you can always type \`cancel\` to start from the beginning
 
-Pricing:
-- Modify bullet color ${coin(BULLET_COLOR_PIRCE)}
-- Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
-- Send message ${coin(MESSAGE_PIRCE)}
+Pricing
+- 🔫 Modify bullet color ${coin(BULLET_COLOR_PIRCE)}
+- 💡 Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
+- 📩 Send message ${coin(MESSAGE_PIRCE)}
 
 You have ${coin(client.money)} What do you want to do?`,
             quick_replies: [
