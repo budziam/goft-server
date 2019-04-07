@@ -67,11 +67,11 @@ export class Api {
 
     private async transformImage(data: Stream): Promise<string> {
         const roundedCorners = Buffer.from(
-            '<svg><rect x="0" y="0" width="64" height="64" rx="50" ry="50"/></svg>',
+            '<svg><rect x="0" y="0" width="32" height="32" rx="50" ry="50"/></svg>',
         );
 
         const roundedCornerResizer = sharp()
-            .resize(64, 64)
+            .resize(32, 32)
             .composite([
                 {
                     input: roundedCorners,
