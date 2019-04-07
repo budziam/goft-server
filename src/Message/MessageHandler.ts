@@ -123,6 +123,8 @@ export class MessageHandler {
             color = "#00FF00";
         } else if (color === "blue") {
             color = "#0000FF";
+        } else if (color === "pink") {
+            color = "#FF00FF";
         }
 
         if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(color)) {
@@ -273,6 +275,12 @@ export class MessageHandler {
                     title: "Blue",
                     payload: "Blue",
                     image_url: "https://gotf.sklep-sms.pl/images/blue.png",
+                },
+                {
+                    content_type: "text",
+                    title: "Pink",
+                    payload: "Pink",
+                    image_url: "https://gotf.sklep-sms.pl/images/pink.png",
                 },
             ],
         });
