@@ -171,6 +171,8 @@ export class MessageHandler {
         }
 
         this.gameManager.spawnEnemies(client);
+        this.gameManager.spawnEnemies(client);
+        this.gameManager.spawnEnemies(client);
         await this.messageSender.send(client, { text: "New warriors have arrived 🔥🔥🔥" });
         await this.messageSender.askForNextAction(client);
     }
