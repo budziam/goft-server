@@ -56,6 +56,11 @@ export class ConnectionHandler {
 
         if (client) {
             data.client = { ...client.profile };
+
+            // FIXME PLEEEASE
+            if (data.type === MessageType.SpawnEnemies) {
+                data.client.avatar = "";
+            }
         }
 
         if (!this.isLive()) {
