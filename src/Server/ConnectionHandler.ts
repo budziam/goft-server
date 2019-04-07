@@ -61,7 +61,7 @@ export class ConnectionHandler {
             return;
         }
 
-        this.socket.write(prependLength(JSON.stringify(message)));
+        this.socket.write(prependLength(JSON.stringify(data)));
     }
 
     @boundMethod
