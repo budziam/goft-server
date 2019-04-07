@@ -32,7 +32,7 @@ export class ImageTool {
 
     public async meme(url: string): Promise<string> {
         const picResponse = await this.axios.get(url, { responseType: "stream" });
-        const resizer = sharp().resize(32, 32);
+        const resizer = sharp().resize(64, 64);
         const buffer = await picResponse.data.pipe(resizer).toBuffer();
         return buffer.toString("base64");
     }
