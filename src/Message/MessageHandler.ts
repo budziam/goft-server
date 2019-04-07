@@ -99,11 +99,7 @@ export class MessageHandler {
     }
 
     private async onActionChosen(client: Client, message: EventMessage): Promise<void> {
-        if (!message.quick_reply) {
-            return this.unknownSituation(client);
-        }
-
-        const text = message.quick_reply.payload;
+        const text = message.quick_reply ? message.quick_reply.payload : message.text;
 
         if (text === ActionPayload.BulletColor) {
             return this.displayPossibleBulletColors(client);
@@ -130,22 +126,23 @@ export class MessageHandler {
             return this.displayPossibleBetRates(client);
         }
 
-        return this.messageSender.displayPossibleActions(client);
+        return this.unknownSituation(client);
     }
 
     private async onBulletColorChosen(client: Client, message: EventMessage): Promise<void> {
-        const text = message.quick_reply ? message.quick_reply.payload : message.text;
-        let color = text.toLowerCase().replace(/^#?/, "#");
+        let text = message.quick_reply ? message.quick_reply.payload : message.text;
 
-        if (color === "red") {
-            color = "#FF0000";
-        } else if (color === "green") {
-            color = "#00FF00";
-        } else if (color === "blue") {
-            color = "#0000FF";
-        } else if (color === "pink") {
-            color = "#FF00FF";
+        if (equals(text, "red")) {
+            text = "#FF0000";
+        } else if (equals(text, "green")) {
+            text = "#00FF00";
+        } else if (equals(text, "blue")) {
+            text = "#0000FF";
+        } else if (equals(text, "pink")) {
+            text = "#FF00FF";
         }
+
+        let color = text.replace(/^#?/, "#");
 
         if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(color)) {
             return this.unknownSituation(client);
