@@ -44,7 +44,6 @@ export class MessageHandler {
     public async handle(psid: Psid, message: EventMessage): Promise<void> {
         const client = this.clientManager.get(psid);
         message.text = message.text.trim();
-        const text = message.text.toLowerCase();
 
         if (!client.profile) {
             this.api
@@ -53,7 +52,7 @@ export class MessageHandler {
                 .catch(console.error);
         }
 
-        if (client.state === ClientState.ActionDecision && text === "elo") {
+        if (client.state === ClientState.ActionDecision && equals(message.text, "elo")) {
             return this.messageSender.send(client, { text: "No siemka ziomek" });
         }
 
@@ -63,7 +62,7 @@ export class MessageHandler {
             });
         }
 
-        if (text === "cancel") {
+        if (equals(message.text, "cancel")) {
             await this.messageSender.send(client, { text: "Let's start from the beginning..." });
             return this.messageSender.displayPossibleActions(client);
         }
