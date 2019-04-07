@@ -8,6 +8,7 @@ export enum ClientState {
     ChooseGameDurationMoney,
     ChooseGameDuration,
     TypeMessage,
+    TypeMeme,
 }
 
 export interface ClientProfile {

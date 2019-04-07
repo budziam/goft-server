@@ -9,6 +9,8 @@ export enum MessageType {
     SwitchLightOff = "switch_light_off",
     ChangeBulletColor = "change_bullet_color",
     SendMessage = "send_message",
+    SendMeme = "send_meme",
+    SpawnEnemies = "spawn_enemies",
     BetGameDuration = "bet_game_duration",
 }
 

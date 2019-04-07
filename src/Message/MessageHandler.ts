@@ -8,8 +8,8 @@ import { NotEnoughMoneyError } from "../Errors/NotEnoughMoneyError";
 import { ConnectionHandler } from "../Server/ConnectionHandler";
 import {
     ActionPayload,
-    BULLET_COLOR_PIRCE,
-    MESSAGE_PIRCE,
+    BULLET_COLOR_PIRCE, SEND_MEME_PIRCE,
+    SEND_MESSAGE_PIRCE, SPAWN_ENEMIES_PRICE,
     SWITCH_LIGHTS_OFF_PIRCE,
 } from "./constants";
 import { coin, MessageSender } from "./MessageSender";
@@ -87,25 +87,41 @@ export class MessageHandler {
             return this.onMessageTyped(client, message);
         }
 
+        if (client.state === ClientState.TypeMeme) {
+            return this.onMemeTyped(client, message);
+        }
+
         return this.unknownSituation(client);
     }
 
     private async onActionChosen(client: Client, message: EventMessage): Promise<void> {
-        const text = message.quick_reply ? message.quick_reply.payload : message.text;
+        if (!message.quick_reply) {
+            return this.unknownSituation(client);
+        }
 
-        if (equals(text, ActionPayload.BulletColor)) {
+        const text = message.quick_reply.payload;
+
+        if (text === ActionPayload.BulletColor) {
             return this.displayPossibleBulletColors(client);
         }
 
-        if (equals(text, ActionPayload.SwitchLightsOff)) {
+        if (text === ActionPayload.SwitchLightsOff) {
             return this.onSwitchLightsOffChosen(client);
         }
 
-        if (equals(text, ActionPayload.SendMessage)) {
+        if (text === ActionPayload.SendMessage) {
             return this.onSendMessageChosen(client);
         }
 
-        if (equals(text, ActionPayload.BetGameDuration)) {
+        if (text === ActionPayload.SendMeme) {
+            return this.onSendMemeChosen(client);
+        }
+
+        if (text === ActionPayload.SpawnEnemies) {
+            return this.onSpawnEnemiesChosen(client);
+        }
+
+        if (text === ActionPayload.BetGameDuration) {
             client.moveToState(ClientState.ChooseGameDurationMoney);
             return this.displayPossibleBetRates(client);
         }
@@ -141,7 +157,21 @@ export class MessageHandler {
 
         this.gameManager.modifyColor(color, client);
         await this.messageSender.send(client, { text: "The bullets look as you wish 🤪" });
-        await this.messageSender.displayPossibleActions(client);
+        await this.messageSender.askForNextAction(client);
+    }
+
+    private async onSpawnEnemiesChosen(client: Client): Promise<void> {
+        client.moveToState(ClientState.ActionDecision);
+
+        try {
+            await this.charge(client, SPAWN_ENEMIES_PRICE);
+        } catch (e) {
+            return this.handleChargeException(client, e);
+        }
+
+        this.gameManager.spawnEnemies(client);
+        await this.messageSender.send(client, { text: "New warriors have arrived 🔥🔥🔥" });
+        await this.messageSender.askForNextAction(client);
     }
 
     private async onSwitchLightsOffChosen(client: Client): Promise<void> {
@@ -155,7 +185,7 @@ export class MessageHandler {
 
         this.gameManager.switchOffLights(client);
         await this.messageSender.send(client, { text: "The lights went off. Ups... 😎😎😎" });
-        await this.messageSender.displayPossibleActions(client);
+        await this.messageSender.askForNextAction(client);
     }
 
     private async onSendMessageChosen(client: Client): Promise<void> {
@@ -169,7 +199,7 @@ export class MessageHandler {
         client.moveToState(ClientState.ActionDecision);
 
         try {
-            await this.charge(client, MESSAGE_PIRCE);
+            await this.charge(client, SEND_MESSAGE_PIRCE);
         } catch (e) {
             return this.handleChargeException(client, e);
         }
@@ -178,7 +208,31 @@ export class MessageHandler {
         await this.messageSender.send(client, {
             text: "Your messaged has been delivered to the COCKpit.",
         });
-        await this.messageSender.displayPossibleActions(client);
+        await this.messageSender.askForNextAction(client);
+    }
+
+    private async onSendMemeChosen(client: Client): Promise<void> {
+        client.moveToState(ClientState.TypeMeme);
+        await this.messageSender.send(client, {
+            text: "Paste link to your meme",
+        });
+    }
+
+    private async onMemeTyped(client: Client, message: EventMessage): Promise<void> {
+        client.moveToState(ClientState.ActionDecision);
+
+        try {
+            await this.charge(client, SEND_MEME_PIRCE);
+        } catch (e) {
+            return this.handleChargeException(client, e);
+        }
+
+        // TODO Get image and resize it
+        this.gameManager.sendMeme(message.text, client);
+        await this.messageSender.send(client, {
+            text: "Your meme has been delivered to the COCKpit.",
+        });
+        await this.messageSender.askForNextAction(client);
     }
 
     private async onGameDurationMoneyChosen(client: Client, message: EventMessage): Promise<void> {
@@ -250,7 +304,7 @@ export class MessageHandler {
                 money,
             )} the game will last for at least ${duration} seconds. Wish you luck! 🙏🙏`,
         });
-        await this.messageSender.displayPossibleActions(client);
+        await this.messageSender.askForNextAction(client);
     }
 
     private async displayPossibleBulletColors(client: Client): Promise<void> {

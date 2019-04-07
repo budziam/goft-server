@@ -24,7 +24,7 @@ export class GameManager {
         this.connectionHandler.send(
             {
                 type: MessageType.ChangeBulletColor,
-                data: { color },
+                data: {color},
             },
             client,
         );
@@ -50,7 +50,7 @@ export class GameManager {
         }, bet.duration * 1000) as any;
         this.timeoutHandles.add(handler);
 
-        console.info("New bet!", { bet });
+        console.info("New bet!", {bet});
     }
 
     public switchOffLights(client: Client): void {
@@ -67,11 +67,32 @@ export class GameManager {
         this.connectionHandler.send(
             {
                 type: MessageType.SendMessage,
-                data: { text },
+                data: {text},
             },
             client,
         );
-        console.info(`Someone send message [${text}]!`);
+        console.info(`Someone sent message [${text}]!`);
+    }
+
+    public sendMeme(image: string, client: Client): void {
+        this.connectionHandler.send(
+            {
+                type: MessageType.SendMeme,
+                data: {image},
+            },
+            client,
+        );
+        console.info(`Someone sent meme`);
+    }
+
+    public spawnEnemies(client: Client): void {
+        this.connectionHandler.send(
+            {
+                type: MessageType.SpawnEnemies,
+            },
+            client,
+        );
+        console.info("Spawn enemies!");
     }
 
     public clear(): void {
