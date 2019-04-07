@@ -54,12 +54,10 @@ export class ServerManager {
     }
 
     private async informClientAboutEnd(client: Client): Promise<void> {
-        let text = "Game has ended. ";
+        let text = `Game has ended. Your account balance ${coin(client.money)} `;
         const result = client.money - INITIAL_MONEY;
 
-        if (result < 0) {
-            text += `You lost ${coin(Math.abs(result))} ¯\\_(ツ)_/¯`;
-        } else if (result > 0) {
+        if (result > 0) {
             text += `You won ${coin(result)} 🔥🔥🔥 FUCKING AWESOME 🔥🔥🔥`;
         }
 
