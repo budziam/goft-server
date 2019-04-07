@@ -58,7 +58,7 @@ export class ConnectionHandler {
             data.client = { ...client.profile };
 
             // FIXME PLEEEASE
-            if (data.type === MessageType.SpawnEnemies) {
+            if (data.type === MessageType.SpawnEnemies || data.type === MessageType.SendMeme) {
                 data.client.avatar = "";
             }
         }
@@ -87,7 +87,9 @@ export class ConnectionHandler {
             return;
         }
 
-        socket.end();
+        if (!socket.destroyed) {
+            socket.end();
+        }
 
         if (socket === this.socket) {
             console.info("Close connection with game!");
