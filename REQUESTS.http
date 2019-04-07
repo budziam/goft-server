@@ -1,0 +1,23 @@
+### Chalenge webhook
+
+GET https://gotf.sklep-sms.pl/webhook?hub.verify_token=secret&hub.challenge=CHALLENGE_ACCEPTED&hub.mode=subscribe
+
+### Send message
+
+POST https://gotf.sklep-sms.pl/webhook
+Content-Type: application/json
+
+{
+  "object": "page",
+  "entry": [
+    {
+      "messaging": [
+        {
+          "message": "TEST_MESSAGE"
+        }
+      ]
+    }
+  ]
+}
+
+###
