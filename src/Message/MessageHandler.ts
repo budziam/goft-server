@@ -53,7 +53,6 @@ export class MessageHandler {
 
         // TODO Handle messages properly even if not clicked by button
         // TODO Change handling elo
-        // TODO Bullets
 
         if (!client.profile) {
             this.api
@@ -132,7 +131,7 @@ export class MessageHandler {
     private async onBulletColorChosen(client: Client, message: EventMessage): Promise<void> {
         const text = message.quick_reply ? message.quick_reply.payload : message.text;
 
-        if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(message.text)) {
+        if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.exec(text)) {
             return this.unknownSituation(client);
         }
 
