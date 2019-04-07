@@ -31,7 +31,7 @@ export class ConnectionHandler {
             this.close();
         }
 
-        socket.setNoDelay(true);
+        socket.setNoDelay(false);
         this.socket = socket;
 
         this.socket
