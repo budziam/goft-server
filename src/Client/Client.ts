@@ -1,5 +1,6 @@
 import { Psid } from "../Message/types";
 import { NotEnoughMoneyError } from "../Errors/NotEnoughMoneyError";
+import { boundMethod } from "autobind-decorator";
 
 export enum ClientState {
     New = 1,
@@ -46,6 +47,7 @@ export class Client {
         return this._profile;
     }
 
+    @boundMethod
     public setProfile(profile: ClientProfile): void {
         this._profile = profile;
     }
