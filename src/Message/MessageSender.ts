@@ -26,7 +26,7 @@ export class MessageSender {
             text: `Hint: you can always type \`cancel\` to start from the beginning
 
 Pricing
-- 🔫 Modify bullet color ${coin(BULLET_COLOR_PIRCE)}
+- 🔫 Bullets color ${coin(BULLET_COLOR_PIRCE)}
 - 💡 Switch lights off ${coin(SWITCH_LIGHTS_OFF_PIRCE)}
 - 📩 Send message ${coin(MESSAGE_PIRCE)}
 
