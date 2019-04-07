@@ -32,7 +32,7 @@ enum BulletColorPayload {
 
 const ALL_IN = "all-in";
 
-const trunc = (text: string, n = 32) => (text.length > n ? text.substr(0, n - 1) + "..." : text);
+const trunc = (text: string, n = 27) => (text.length > n ? text.substr(0, n - 1) + "..." : text);
 
 @injectable()
 export class MessageHandler {
@@ -53,6 +53,7 @@ export class MessageHandler {
 
         // TODO Handle messages properly even if not clicked by button
         // TODO Change handling elo
+        // TODO Bullets
 
         if (!client.profile) {
             this.api
@@ -167,7 +168,7 @@ export class MessageHandler {
     private async onSendMessageChosen(client: Client): Promise<void> {
         client.moveToState(ClientState.TypeMessage);
         await this.messageSender.send(client, {
-            text: "Type your message, no longer than 32 characters:",
+            text: "Type your message, no longer than 29 characters:",
         });
     }
 

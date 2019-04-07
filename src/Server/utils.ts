@@ -15,7 +15,7 @@ export const splitData = (data: Buffer, callback: (msg: string) => void) => {
 };
 
 export const prependLength = (message: string): Buffer => {
-    const length = message.length;
+    const length = Buffer.byteLength(message, 'utf8');
 
     const lengthArray = new Uint8Array([
         length & 0x000000ff,
