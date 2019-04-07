@@ -24,8 +24,6 @@ export class ServerManager {
 
     @boundMethod
     public startGame(): void {
-        console.log("ServerManager: startGame");
-
         for (const client of this.clientManager.clients) {
             this.informClientAboutStart(client).catch(console.error);
         }
@@ -36,8 +34,6 @@ export class ServerManager {
 
     @boundMethod
     public endGame(): void {
-        console.log("ServerManager: endGame");
-
         for (const client of this.clientManager.clients) {
             this.informClientAboutEnd(client).catch(console.error);
         }
