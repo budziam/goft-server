@@ -47,7 +47,7 @@ export class MessageHandler {
 
     public async handle(psid: Psid, message: EventMessage): Promise<void> {
         const client = this.clientManager.get(psid);
-        message.text = message.text.trim();
+        message.text = message.text ? message.text.trim() : "";
 
         if (!client.profile) {
             this.api
