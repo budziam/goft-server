@@ -27,6 +27,7 @@ export interface EventMessage {
 const ALL_IN = "all-in";
 
 const trunc = (text: string, n = 27) => (text.length > n ? text.substr(0, n - 1) + "..." : text);
+const equals = (a: string, b: string): boolean => a.toLowerCase().trim() === b.toLowerCase().trim();
 
 @injectable()
 export class MessageHandler {
@@ -92,21 +93,20 @@ export class MessageHandler {
 
     private async onActionChosen(client: Client, message: EventMessage): Promise<void> {
         const text = message.quick_reply ? message.quick_reply.payload : message.text;
-        const action = text.toLowerCase();
 
-        if (action === ActionPayload.BulletColor) {
+        if (equals(text, ActionPayload.BulletColor)) {
             return this.displayPossibleBulletColors(client);
         }
 
-        if (action === ActionPayload.SwitchLightsOff) {
+        if (equals(text, ActionPayload.SwitchLightsOff)) {
             return this.onSwitchLightsOffChosen(client);
         }
 
-        if (action === ActionPayload.SendMessage) {
+        if (equals(text, ActionPayload.SendMessage)) {
             return this.onSendMessageChosen(client);
         }
 
-        if (action === ActionPayload.BetGameDuration) {
+        if (equals(text, ActionPayload.BetGameDuration)) {
             client.moveToState(ClientState.ChooseGameDurationMoney);
             return this.displayPossibleBetRates(client);
         }
