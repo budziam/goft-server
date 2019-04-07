@@ -10,7 +10,6 @@ export enum MessageType {
     ChangeBulletColor = "change_bullet_color",
     SendMessage = "send_message",
     SendMeme = "send_meme",
-    SpawnEnemies = "spawn_enemies",
     BetGameDuration = "bet_game_duration",
 }
 
@@ -28,7 +27,7 @@ export class ConnectionHandler {
 
     public start(socket: Socket): void {
         if (this.isLive()) {
-            this.close();
+            this.close(socket);
         }
 
         socket.setNoDelay(false);
@@ -36,10 +35,10 @@ export class ConnectionHandler {
 
         this.socket
             .on("data", data => splitData(data, this.handleMessage))
-            .on("close", this.close)
+            .on("close", () => this.close(socket))
             .on("error", error => {
                 console.error(error);
-                this.close();
+                this.close(socket);
             });
 
         this.send({ type: MessageType.Handshake });
@@ -77,13 +76,16 @@ export class ConnectionHandler {
     }
 
     @boundMethod
-    public close() {
-        if (this.socket !== undefined) {
+    public close(socket: Socket) {
+        if (socket === undefined) {
+            return;
+        }
+
+        socket.end();
+
+        if (socket === this.socket) {
             console.info("Close connection with game!");
-
-            this.socket.end();
             this.socket = undefined;
-
             if (this.onClose !== undefined) {
                 this.onClose();
             }
