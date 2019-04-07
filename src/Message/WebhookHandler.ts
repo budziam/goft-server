@@ -21,10 +21,8 @@ export class WebhookHandler {
     public async handle(event: WebhookEvent): Promise<void> {
         console.log("Handle webhook event", {
             psid: event.sender.id,
-            message: {
-                text: event.message.text,
-                quick_reply: event.message.quick_reply,
-            },
+            text: event.message.text,
+            quick_reply: event.message.quick_reply,
         });
 
         try {
